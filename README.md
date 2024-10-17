@@ -1,8 +1,11 @@
-# `V2Project_01`
+# AirBnB Clone
 
 ## Database Schema Design
 
-`<insert database schema design here>`
+![airbnb-database-schema]
+
+[airbnb-database-schema]: https://appacademy-open-assets.s3.us-west-1.amazonaws.com/Modular-Curriculum/content/week-12/airbnb-db-schema.png
+[airbnb-db-diagram-info]: https://appacademy-open-assets.s3.us-west-1.amazonaws.com/Modular-Curriculum/content/week-12/airbnb-db-diagram-info.txt
 
 ## API Documentation
 
@@ -1307,7 +1310,7 @@ Delete an existing image for a Spot.
 * Require proper authorization: Spot must belong to the current user
 * Request
   * Method: DELETE
-  * Route path: /api/images/:imageId
+  * Route path: /api/spot-images/:imageId
   * Body: none
 
 * Successful Response
@@ -1342,7 +1345,7 @@ Delete an existing image for a Review.
 * Require proper authorization: Review must belong to the current user
 * Request
   * Method: DELETE
-  * Route path: /api/images/:imageId
+  * Route path: /api/review-images/:imageId
   * Body: none
 
 * Successful Response
