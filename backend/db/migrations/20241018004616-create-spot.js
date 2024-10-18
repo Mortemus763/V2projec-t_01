@@ -9,7 +9,7 @@ module.exports = {
         primaryKey: true,
         type: Sequelize.INTEGER
       },
-      onwerId: {
+      ownerId: {
         type: Sequelize.INTEGER
       },
       address: {
