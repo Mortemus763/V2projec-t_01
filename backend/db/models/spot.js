@@ -13,6 +13,9 @@ module.exports = (sequelize, DataTypes) => {
       Spot.belongsTo(models.User, {
         foreignKey: 'ownerId'
       });
+    Spot.hasMany(models.Review, {
+      foreignKey: 'spotId',
+      });
     }
   }
   Spot.init({
