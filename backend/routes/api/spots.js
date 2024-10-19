@@ -1,51 +1,98 @@
 const express = require('express');
 const router = express.Router()
 
-const { User, Spot, sequelize } = require('../../db/models')
+const { check } = require('express-validator');
+const { handleValidationErrors } = require('../../utils/validation');
+
+const { User, Spot, sequelize } = require('../../db/models');
+
+const validateSpot = [
+    check('address')
+        .exists({ checkFalsy: true })
+        .notEmpty()
+        .withMessage('Please provide address'),
+    check('city')
+        .exists({ checkFalsy: true })
+        .notEmpty()
+        .withMessage('Please provide city'),
+    check('state')
+        .exists({ checkFalsy: true })
+        .notEmpty()
+        .withMessage('Please provide state'),
+    check('country')
+        .exists({ checkFalsy: true })
+        .notEmpty()
+        .withMessage('Please provide country'),
+    check('lat')
+        .exists({ checkFalsy: true })
+        .notEmpty()
+        .withMessage('Please provide lat'),
+    check('name')
+        .exists({ checkFalsy: true })
+        .notEmpty()
+        .withMessage('Please provide name'),
+    check('description')
+        .exists({ checkFalsy: true })
+        .notEmpty()
+        .withMessage('Please provide description'),
+    check('price')
+        .exists({ checkFalsy: true })
+        .notEmpty()
+        .withMessage('Please provide price'),
+    handleValidationErrors
+]
 
 //create a spot
-router.post('/', async (req, res, next) => {
-    const t = await sequelize.transaction();
-    
-    try {
+router.post('/',
+    validateSpot,
+    async (req, res, next) => {
 
-        const {
-            address,
-            city,
-            state,
-            country,
-            lat, lng,
-            name,
-            description,
-            price
-        } = req.body
+        //Create a transaction
+        const t = await sequelize.transaction();
 
-        const user = await User.findByPk({ id: ownerId });
-        const spot = Spot.build({
-            address,
-            city,
-            state,
-            country,
-            lat, lng,
-            name,
-            description,
-            price
-        });
-        await spot.save();
-        await user.addSpot(spot);
+        try {
+            const { id } = req.user
+            const {
+                address,
+                city,
+                state,
+                country,
+                lat, lng,
+                name,
+                description,
+                price
+            } = req.body
 
-        await t.commit();
+            const spot = Spot.build({
+                address,
+                city,
+                state,
+                country,
+                lat, lng,
+                name,
+                description,
+                price
+            });
 
-        return res.status(201).json({ spot });
+            const user = await User.findByPk(id);
+            await spot.save();
+            await user.addSpot(spot);
 
-    } catch (error) {
-        await t.rollback();
-        const err = new Error("Failed to create new spot");
-        err.status = 500
-        err.title = "Failed to create new spot"
-        err.errors = { error: error.message }
-        return next(err)
-    }
-});
+            //COMMIT
+            await t.commit();
+
+            const newSpot = await Spot.findByPk(spot.id, {
+                attributes: ['id', 'ownerId', 'address', 'city', 'state', 'country', 'lat', 'lng', 'name', 'description', 'price', 'createdAt', 'updatedAt']
+            })
+
+            return res.status(201).json(newSpot);
+
+        } catch (error) {
+            //ROLLBACK
+            await t.rollback();
+
+            next(error)
+        }
+    });
 
 module.exports = router
