@@ -134,7 +134,7 @@ router.get('/current',
                     attributes: [[Sequelize.fn('avg', Sequelize.col('stars')), 'avgRating']],
                 }, {
                     model: SpotImage,
-                    attributes:[['preview', 'previewImage']]
+                    attributes: [['preview', 'previewImage']]
                 }]
             });
             return res.json(spots)
