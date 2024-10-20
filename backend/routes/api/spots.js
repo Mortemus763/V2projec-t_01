@@ -146,5 +146,62 @@ router.get('/current',
             next(err)
         }
     });
+router.get('/', async (req, res) => {
+        try {
+            const spots = await Spot.findAll({
+                include: [
+                    {
+                        model: SpotImage,
+                        attributes: ['url'], 
+                        where: { preview: true }, 
+                        required: false
+                    },
 
+                    {
+                        model: Review,
+                        attributes: []
+                    }
+                ],
+                attributes: {
+                    include: [
+                        [
+                            sequelize.fn('AVG', sequelize.col('Reviews.stars')),
+                            'avgRating'
+                        ]
+                    ]
+                },
+                group: ['Spot.id', 'SpotImages.url']
+            });
+            const formattedSpots = spots.map(spot => {
+                let previewImage = null;
+    
+                if (spot.SpotImages && spot.SpotImages.length > 0) {
+                    previewImage = spot.SpotImages[0].url; 
+                }
+    
+                return {
+                    id: spot.id,
+                    ownerId: spot.ownerId,
+                    address: spot.address,
+                    city: spot.city,
+                    state: spot.state,
+                    country: spot.country,
+                    lat: spot.lat,
+                    lng: spot.lng,
+                    name: spot.name,
+                    description: spot.description,
+                    price: spot.price,
+                    createdAt: spot.createdAt,
+                    updatedAt: spot.updatedAt,
+                    avgRating: parseFloat(spot.dataValues.avgRating).toFixed(1) || null, 
+                    previewImage: previewImage 
+                };
+            });
+
+            return res.status(200).json({ Spots: formattedSpots });
+        } catch (err) {
+            console.error(err);
+            return res.status(500).json({ error: 'Something went wrong' });
+        }
+    });
 module.exports = router
