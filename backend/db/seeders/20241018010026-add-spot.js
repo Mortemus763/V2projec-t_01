@@ -1,5 +1,9 @@
 'use strict';
 const { User, Spot } = require('../models')
+const options = { tableName: 'Spots' }
+if (process.env.NODE_ENV === 'production') {
+  options.schema = process.env.SCHEMA
+}
 /** @type {import('sequelize-cli').Migration} */
 module.exports = {
   async up(queryInterface, Sequelize) {
@@ -35,15 +39,6 @@ module.exports = {
      * Example:
      * await queryInterface.bulkDelete('People', null, {});
      */
-    const username = await User.findOne({
-      where: {
-        username: 'FakeUser1'
-      }
-    });
-    await Spot.destroy({
-      where: {
-        ownerId: username.id
-      }
-    });
+    await queryInterface.bulkDelete(options, null, {});
   }
 };

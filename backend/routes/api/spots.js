@@ -4,8 +4,8 @@ const router = express.Router()
 const { check } = require('express-validator');
 const { handleValidationErrors } = require('../../utils/validation');
 
-const { User, Spot, sequelize } = require('../../db/models');
-const { requireAuthorization } = require('../../utils/auth');
+const { User, Spot, Review, SpotImage, sequelize, Sequelize } = require('../../db/models');
+const { requireAuthorization, requireAuth } = require('../../utils/auth');
 
 const validateSpot = [
     check('address')
@@ -110,17 +110,40 @@ router.put('/:spotId',
                 error.errors = { message: "Record not found" };
                 return next(error);
             }
-            console.log('req.body :>> ', req.body);
-            const upObj = await Spot.update(req.body, {
+            await Spot.update(req.body, {
                 where: { id }
             })
-            console.log('upObj :>> ', upObj);
             const updateSpot = await Spot.findByPk(id, {
                 attributes: ['id', 'ownerId', 'address', 'city', 'state', 'country', 'lat', 'lng', 'name', 'description', 'price', 'createdAt', 'updatedAt']
             })
             return res.json(updateSpot)
         } catch (error) {
             next(error)
+        }
+    });
+
+router.get('/current',
+    requireAuth,
+    async (req, res, next) => {
+        try {
+            const { id } = req.user
+            const spots = await Spot.findAll({
+                where: { ownerId: id },
+                include: [{
+                    model: Review,
+                    attributes: [[Sequelize.fn('avg', Sequelize.col('stars')), 'avgRating']],
+                }, {
+                    model: SpotImage,
+                    attributes:[['preview', 'previewImage']]
+                }]
+            });
+            return res.json(spots)
+        } catch (error) {
+            const err = new Error("Failed to get data");
+            err.title = "Failed to get data"
+            err.status = 500
+            err.errors = { message: error.message }
+            next(err)
         }
     });
 
