@@ -123,6 +123,58 @@ router.put('/:spotId',
         }
     });
 
+router.get('/:spotId', async (req, res) => {
+    const { spotId } = req.params;
+
+    const spot = await Spot.findByPk(spotId, {
+        include: [
+            {
+                model: SpotImage,
+                attributes: ['id', 'url', 'preview']
+            },
+            {
+                model: User,
+                attributes: ['id', 'firstname', 'lastname']
+            }
+        ]
+    });
+    if (!spot) {
+        return res.status(404).json({
+            message: "Spot couldn't be found"
+        });
+    }
+    const reviews = await Review.findAll({
+        where: { spotId: spot.id },
+        attributes: [
+            [sequelize.fn('COUNT', sequelize.col('id')), 'numReviews'], // Count reviews
+            [sequelize.fn('AVG', sequelize.col('stars')), 'avgStarRating'] // Average rating
+        ]
+    });
+    const numReviews = parseInt(reviews[0].dataValues.numReviews) || 0;
+    const avgStarRating = parseFloat(reviews[0].dataValues.avgStarRating).toFixed(1) || null;
+
+    const spotDetails = {
+        id: spot.id,
+        ownerId: spot.ownerId,
+        address: spot.address,
+        city: spot.city,
+        state: spot.state,
+        country: spot.country,
+        lat: parseFloat(spot.lat),
+        lng: parseFloat(spot.lng),
+        name: spot.name,
+        description: spot.description,
+        price: parseFloat(spot.price),
+        createdAt: spot.createdAt,
+        updatedAt: spot.updatedAt,
+        numReviews: numReviews,
+        avgStarRating: avgStarRating,
+        SpotImages: spot.SpotImages,
+        Owner: spot.Owner
+    };
+
+    return res.status(200).json(spotDetails);
+});
 
 router.delete('/:spotId',
     requireAuth,
@@ -170,7 +222,7 @@ router.get('/current',
                     {
                         model: Review,
                         attributes: []
-                    }, 
+                    },
                     {
                         model: SpotImage,
                         attributes: []
@@ -185,7 +237,7 @@ router.get('/current',
             });
 
             return res.json(spots)
-            
+
         } catch (error) {
             const err = new Error("Failed to get data");
             err.title = "Failed to get data"
@@ -196,15 +248,15 @@ router.get('/current',
     });
 
 router.get('/', async (req, res) => {
-        try {
-            const spots = await Spot.findAll({
-                include: [
-                    {
-                        model: SpotImage,
-                        attributes: ['url'], 
-                        where: { preview: true }, 
-                        required: false
-                    },
+    try {
+        const spots = await Spot.findAll({
+            include: [
+                {
+                    model: SpotImage,
+                    attributes: ['url'],
+                    where: { preview: true },
+                    required: false
+                },
 
                 {
                     model: Review,
