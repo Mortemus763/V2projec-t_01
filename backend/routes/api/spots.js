@@ -6,6 +6,7 @@ const { handleValidationErrors } = require('../../utils/validation');
 
 const { User, Spot, Review, SpotImage, sequelize, Sequelize } = require('../../db/models');
 const { requireAuthorization, requireAuth } = require('../../utils/auth');
+const { where } = require('sequelize');
 
 const validateSpot = [
     check('address')
@@ -122,6 +123,42 @@ router.put('/:spotId',
         }
     });
 
+
+router.delete('/:spotId',
+    requireAuth,
+    requireAuthorization,
+    async (req, res, next) => {
+        try {
+
+            const { spotId } = req.params
+            if (!spotId) {
+                const error = new Error("Bad request")
+                error.title = "Bad request"
+                error.status = 400;
+                error.errors = { message: "Bad request" }
+                return next(error)
+            }
+
+            const spot = await Spot.findByPk(spotId)
+            if (!spot) {
+                const error = new Error("Not found")
+                error.title = "Not found"
+                error.status = 404;
+                error.errors = { message: "Not found" }
+                return next(error);
+            }
+
+            await Spot.destroy({ where: { id: spotId } })
+            return res.json({ message: "success" })
+
+        } catch (error) {
+            const err = new Error("Failed to delete spot")
+            err.title = "Failed to delete spot"
+            err.status = 500
+            err.errors = { message: error.message }
+        }
+    });
+
 router.get('/current',
     requireAuth,
     async (req, res, next) => {
@@ -129,15 +166,25 @@ router.get('/current',
             const { id } = req.user
             const spots = await Spot.findAll({
                 where: { ownerId: id },
-                include: [{
-                    model: Review,
-                    attributes: [[Sequelize.fn('avg', Sequelize.col('stars')), 'avgRating']],
-                }, {
-                    model: SpotImage,
-                    attributes: [['preview', 'previewImage']]
-                }]
+                include: [
+                    {
+                        model: Review,
+                        attributes: []
+                    }, 
+                    {
+                        model: SpotImage,
+                        attributes: [['preview', 'previewImage']]
+                    }
+                ],
+                attributes: {
+                    include: [
+                        [Sequelize.fn('avg', Sequelize.col('Reviews.stars')), 'avgRating']
+                    ]
+                }
             });
+
             return res.json(spots)
+            
         } catch (error) {
             const err = new Error("Failed to get data");
             err.title = "Failed to get data"
@@ -146,62 +193,63 @@ router.get('/current',
             next(err)
         }
     });
+
 router.get('/', async (req, res) => {
-        try {
-            const spots = await Spot.findAll({
-                include: [
-                    {
-                        model: SpotImage,
-                        attributes: ['url'], 
-                        where: { preview: true }, 
-                        required: false
-                    },
-
-                    {
-                        model: Review,
-                        attributes: []
-                    }
-                ],
-                attributes: {
-                    include: [
-                        [
-                            sequelize.fn('AVG', sequelize.col('Reviews.stars')),
-                            'avgRating'
-                        ]
-                    ]
+    try {
+        const spots = await Spot.findAll({
+            include: [
+                {
+                    model: SpotImage,
+                    attributes: ['url'],
+                    where: { preview: true },
+                    required: false
                 },
-                group: ['Spot.id', 'SpotImages.url']
-            });
-            const formattedSpots = spots.map(spot => {
-                let previewImage = null;
-    
-                if (spot.SpotImages && spot.SpotImages.length > 0) {
-                    previewImage = spot.SpotImages[0].url; 
-                }
-    
-                return {
-                    id: spot.id,
-                    ownerId: spot.ownerId,
-                    address: spot.address,
-                    city: spot.city,
-                    state: spot.state,
-                    country: spot.country,
-                    lat: spot.lat,
-                    lng: spot.lng,
-                    name: spot.name,
-                    description: spot.description,
-                    price: spot.price,
-                    createdAt: spot.createdAt,
-                    updatedAt: spot.updatedAt,
-                    avgRating: parseFloat(spot.dataValues.avgRating).toFixed(1) || null, 
-                    previewImage: previewImage 
-                };
-            });
 
-            return res.status(200).json({ Spots: formattedSpots });
-        } catch (err) {
-            console.error(err);
-            return res.status(500).json({ error: 'Something went wrong' });
-        }
-    });
+                {
+                    model: Review,
+                    attributes: []
+                }
+            ],
+            attributes: {
+                include: [
+                    [
+                        sequelize.fn('AVG', sequelize.col('Reviews.stars')),
+                        'avgRating'
+                    ]
+                ]
+            },
+            group: ['Spot.id', 'SpotImages.url']
+        });
+        const formattedSpots = spots.map(spot => {
+            let previewImage = null;
+
+            if (spot.SpotImages && spot.SpotImages.length > 0) {
+                previewImage = spot.SpotImages[0].url;
+            }
+
+            return {
+                id: spot.id,
+                ownerId: spot.ownerId,
+                address: spot.address,
+                city: spot.city,
+                state: spot.state,
+                country: spot.country,
+                lat: spot.lat,
+                lng: spot.lng,
+                name: spot.name,
+                description: spot.description,
+                price: spot.price,
+                createdAt: spot.createdAt,
+                updatedAt: spot.updatedAt,
+                avgRating: parseFloat(spot.dataValues.avgRating).toFixed(1) || null,
+                previewImage: previewImage
+            };
+        });
+
+        return res.status(200).json({ Spots: formattedSpots });
+    } catch (err) {
+        console.error(err);
+        return res.status(500).json({ error: 'Something went wrong' });
+    }
+});
 module.exports = router
