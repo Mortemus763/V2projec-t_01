@@ -148,7 +148,7 @@ router.delete('/:spotId',
                 return next(error);
             }
 
-            await Spot.destroy({ where: { id: spotId } })
+            await spot.destroy()
             return res.json({ message: "success" })
 
         } catch (error) {
@@ -173,12 +173,13 @@ router.get('/current',
                     }, 
                     {
                         model: SpotImage,
-                        attributes: [['preview', 'previewImage']]
+                        attributes: []
                     }
                 ],
                 attributes: {
                     include: [
-                        [Sequelize.fn('avg', Sequelize.col('Reviews.stars')), 'avgRating']
+                        [Sequelize.fn('avg', Sequelize.col('Reviews.stars')), 'avgRating'],
+                        [Sequelize.col('SpotImages.preview'), 'previewImage']
                     ]
                 }
             });
