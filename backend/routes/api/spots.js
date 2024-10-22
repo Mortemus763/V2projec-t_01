@@ -96,7 +96,26 @@ router.post('/',
             next(error)
         }
     });
+//New image for spot based on Spot's id    
+router.post('/:spotId/images', requireAuth, requireAuthorization, async (req, res, next) => {
+    const { spotId } = req.params;
+    const { url, preview } = req.body;
+    try {
+        const newImage = await SpotImage.create({
+            spotId,
+            url,
+            preview,
+        });
 
+        return res.status(201).json({
+            id: newImage.id,
+            url: newImage.url,
+            preview: newImage.preview
+        });
+    } catch (error) {
+        next(error);
+    }
+})
 router.put('/:spotId',
     validateSpot,
     requireAuthorization,
@@ -134,6 +153,7 @@ router.get('/:spotId', async (req, res) => {
             },
             {
                 model: User,
+                as: 'Owner',
                 attributes: ['id', 'firstname', 'lastname']
             }
         ]

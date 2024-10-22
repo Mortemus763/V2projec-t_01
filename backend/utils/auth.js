@@ -75,7 +75,7 @@ const requireAuthorization = async (req, res, next) => {
   try {
     const spot = await Spot.findByPk(spotId);
     if (!spot) {
-      const err = new Error('Spot not found');
+      const err = new Error("Spot couldn't be found");
       err.status = 404;
       return next(err);
     }
