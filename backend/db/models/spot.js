@@ -25,7 +25,6 @@ module.exports = (sequelize, DataTypes) => {
       });
       Spot.hasMany(models.SpotImage, {
         foreignKey: 'spotId',
-        as: 'SpotImages',
         onDelete: 'CASCADE',
         hooks: true
       })
