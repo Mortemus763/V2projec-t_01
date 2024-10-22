@@ -1,5 +1,6 @@
 const express = require('express');
 const bcrypt = require('bcryptjs');
+const { Op } = require('sequelize');
 
 const { setTokenCookie, requireAuth, requireAuthorization } = require('../../utils/auth');
 const { User, Spot } = require('../../db/models');
