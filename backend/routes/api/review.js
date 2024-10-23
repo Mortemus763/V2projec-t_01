@@ -5,13 +5,18 @@ const { check } = require('express-validator');
 const { handleValidationErrors } = require('../../utils/validation');
 
 const { User, Spot, Review, SpotImage, ReviewImages } = require('../../db/models');
-const { requireAuthorization, requireAuth } = require('../../utils/auth');
+const { requireAuthorization, requireReviewAuthorization, requireAuth } = require('../../utils/auth');
 
 router.delete('/:reviewId',
     requireAuth,
-    requireAuthorization,
+    requireReviewAuthorization,
     async (req, res, next) => {
+
         try {
+            const { reviewId } = req.params
+            const review = await Review.findByPk(reviewId)
+            await review.destroy()
+            return res.json({ message: "success" })
 
         } catch (error) {
             const err = new Error("Failed to delete")
