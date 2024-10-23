@@ -2,7 +2,7 @@ const express = require('express');
 const router = express.Router()
 
 const { check } = require('express-validator');
-const { handleValidationErrors } = require('../../utils/validation');
+const { handleValidationErrors, validateReview } = require('../../utils/validation');
 
 const { User, Spot, Review, SpotImage, sequelize, Sequelize } = require('../../db/models');
 const { requireAuthorization, requireAuth } = require('../../utils/auth');
@@ -43,17 +43,6 @@ const validateSpot = [
     handleValidationErrors
 ]
 
-const validateReview = [
-    check('review')
-        .exists({ checkFalsy: true })
-        .notEmpty()
-        .withMessage('Please provide review'),
-    check('stars')
-        .exists({ checkFalsy: true })
-        .notEmpty()
-        .withMessage('Please provide rating'),
-    handleValidationErrors
-]
 //create a spot
 router.post('/',
     validateSpot,
