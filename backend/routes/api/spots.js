@@ -6,7 +6,6 @@ const { handleValidationErrors } = require('../../utils/validation');
 
 const { User, Spot, Review, SpotImage, sequelize, Sequelize } = require('../../db/models');
 const { requireAuthorization, requireAuth } = require('../../utils/auth');
-const { where } = require('sequelize');
 
 const validateSpot = [
     check('address')
@@ -44,6 +43,17 @@ const validateSpot = [
     handleValidationErrors
 ]
 
+const validateReview = [
+    check('review')
+        .exists({ checkFalsy: true })
+        .notEmpty()
+        .withMessage('Please provide review'),
+    check('stars')
+        .exists({ checkFalsy: true })
+        .notEmpty()
+        .withMessage('Please provide rating'),
+    handleValidationErrors
+]
 //create a spot
 router.post('/',
     validateSpot,
@@ -116,6 +126,53 @@ router.post('/:spotId/images', requireAuth, requireAuthorization, async (req, re
         next(error);
     }
 })
+//New review
+router.post('/:spotId/reviews',
+    requireAuth,
+    validateReview,
+    async (req, res, next) => {
+        try {
+
+            const { spotId } = req.params;
+            const { id: userId } = req.user;
+
+            //Check if spot exist
+            const spot = await Spot.findByPk(spotId)
+            if (!spot) {
+                const error = new Error("Not found")
+                error.title = "Not found"
+                error.status = 404
+                error.errors = { message: "Spot not found" }
+                return next(error)
+            }
+
+            //Check if review exist
+            const isReviewExist = await Review.findOne({ where: { spotId, userId } })
+            if (isReviewExist) {
+                const error = new Error("Forbiden")
+                error.status = 403
+                error.title = "Forbiden"
+                error.errors = { message: "Forbiden to create review" }
+                return next(error)
+            }
+
+            //Add new review
+            const newReview = await Review.create({ ...req.body, userId, spotId });
+            const review = await Review.findByPk(newReview.id, {
+                attributes: [
+                    'id', 'userId', 'spotId', 'review', 'stars', 'createdAt', 'updatedAt']
+            })
+            return res.status(201).json(review);
+
+        } catch (error) {
+            const err = new Error("Failed to create review")
+            err.status = 500
+            err.title = "Failed to create review"
+            err.errors = { message: error.message }
+            return next(err)
+        }
+    });
+
 router.put('/:spotId',
     validateSpot,
     requireAuthorization,
