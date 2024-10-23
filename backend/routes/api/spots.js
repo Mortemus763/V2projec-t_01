@@ -282,7 +282,6 @@ router.get('/current',
                 },
                 {
                     model: User,
-                    as: 'Owner',
                     attributes: ['id', 'firstname', 'lastname']
                 }
             ]
@@ -319,7 +318,11 @@ router.get('/current',
             numReviews: numReviews,
             avgStarRating: avgStarRating,
             SpotImages: spot.SpotImages,
-            Owner: spot.Owner
+            Owner: {
+                id: spot.User.id,
+                firstName: spot.User.firstname,
+                lastName: spot.User.lastname
+            }
         };
     
         return res.status(200).json(spotDetails);
