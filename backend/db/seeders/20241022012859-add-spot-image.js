@@ -1,6 +1,8 @@
 'use strict';
-const { User, Spot } = require('../models')
-const options = { tableName: 'Spots' }
+
+const { Spot, SpotImage } = require('../models')
+
+const options = { tableName: 'SpotImages' }
 if (process.env.NODE_ENV === 'production') {
   options.schema = process.env.SCHEMA
 }
@@ -16,20 +18,12 @@ module.exports = {
      *   isBetaMember: false
      * }], {});
     */
-    const spot = await Spot.create({
-      address: '111 Main St',
-      city: "Atlanta",
-      state: 'GA',
-      name: 'Appartment',
-      price: 99.00,
-      description: "Comfortable 1br appertments in downtown"
-    });
-    const user = await User.findOne({
-      where: {
-        username: "FakeUser1"
-      }
-    });
-    await user.addSpot(spot)
+    const spot = await Spot.findOne();
+    const image = await SpotImage.create({
+      url: "some url",
+      preview: true
+    })
+    await spot.addSpotImage(image);
   },
 
   async down(queryInterface, Sequelize) {
