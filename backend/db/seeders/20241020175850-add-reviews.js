@@ -21,17 +21,17 @@ module.exports = {
      * }], {});
     */
     const spot = await Spot.findOne({
-      include: [{ model: User }]
+      include: [{ model: User, as: 'Owner' }]
     })
     const reviews = [{
       review: "This is wanderful appatment. I'll return here next time.",
       stars: 5,
-      userId: spot.User.id,
+      userId: spot.Owner.id,
       spotId: spot.id
     }, {
       review: "Not bad but I've seen better.",
       stars: 3,
-      userId: spot.User.id,
+      userId: spot.Owner.id,
       spotId: spot.id
     }];
     reviews.forEach(async review => {
