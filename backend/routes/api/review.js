@@ -1,12 +1,19 @@
 const express = require('express');
-const { requireAuthorization, requireAuth } = require('../../utils/auth');
 const router = express.Router()
+
+const { requireReviewAuthorization, requireAuth } = require('../../utils/auth');
+const { Review } = require('../../db/models')
 
 router.delete('/:reviewId',
     requireAuth,
-    requireAuthorization,
+    requireReviewAuthorization,
     async (req, res, next) => {
+
         try {
+            const { reviewId } = req.params
+            const review = await Review.findByPk(reviewId)
+            await review.destroy()
+            return res.json({ message: "success" })
 
         } catch (error) {
             const err = new Error("Failed to delete")
