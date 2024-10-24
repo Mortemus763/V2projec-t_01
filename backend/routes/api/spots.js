@@ -4,7 +4,7 @@ const router = express.Router()
 const { check } = require('express-validator');
 const { handleValidationErrors, validateReview } = require('../../utils/validation');
 
-const { User, Spot, Review, SpotImage, sequelize, Sequelize } = require('../../db/models');
+const { User, Spot, Review, SpotImage, ReviewImages, sequelize, Sequelize } = require('../../db/models');
 const { requireAuthorization, requireAuth } = require('../../utils/auth');
 
 const validateSpot = [
@@ -95,7 +95,7 @@ router.post('/',
             next(error)
         }
     });
-//New image for spot based on Spot's id    
+//New image for spot based on Spot's id
 router.post('/:spotId/images', requireAuth, requireAuthorization, async (req, res, next) => {
     const { spotId } = req.params;
     const { url, preview } = req.body;
@@ -223,7 +223,84 @@ router.delete('/:spotId',
             next(err)
         }
     });
+    router.get('/:spotId/reviews', async (req, res, next) => {
+        const { spotId } = req.params;
 
+        try {
+
+            const spot = await Spot.findByPk(spotId, {
+                include: [
+                    { model: SpotImage, attributes: ['id', 'url', 'preview'] },
+                    { model: User, attributes: ['id', 'firstname', 'lastname'] }
+                ]
+            });
+
+
+            if (!spot) {
+                return res.status(404).json({
+                    message: "Spot couldn't be found"
+                });
+            }
+
+
+            const reviews = await Review.findAll({
+                where: { spotId: spot.id },
+                include: [
+                    { model: User, attributes: ['id', 'firstname', 'lastname'] },
+                    { model: ReviewImages, attributes: ['id', 'url'] }
+                ]
+            });
+
+
+            const numReviews = reviews.length;
+            const avgStarRating = reviews.reduce((sum, review) => sum + review.stars, 0) / (numReviews || 1);
+
+
+            const spotDetails = {
+                id: spot.id,
+                ownerId: spot.ownerId,
+                address: spot.address,
+                city: spot.city,
+                state: spot.state,
+                country: spot.country,
+                lat: parseFloat(spot.lat),
+                lng: parseFloat(spot.lng),
+                name: spot.name,
+                description: spot.description,
+                price: parseFloat(spot.price),
+                createdAt: spot.createdAt,
+                updatedAt: spot.updatedAt,
+                numReviews: numReviews,
+                avgStarRating: parseFloat(avgStarRating).toFixed(1),
+                SpotImages: spot.SpotImages,
+                Owner: {
+                    id: spot.User.id,
+                    firstName: spot.User.firstname,
+                    lastName: spot.User.lastname
+                },
+                Reviews: reviews.map(review => ({
+                    id: review.id,
+                    userId: review.userId,
+                    spotId: review.spotId,
+                    review: review.review,
+                    stars: review.stars,
+                    createdAt: review.createdAt,
+                    updatedAt: review.updatedAt,
+                    User: {
+                        id: review.User.id,
+                        firstName: review.User.firstname,
+                        lastName: review.User.lastname
+                    },
+                    ReviewImages: review.ReviewImages
+                }))
+            };
+
+
+            return res.status(200).json(spotDetails);
+        } catch (error) {
+            next(error);
+        }
+    });
 router.get('/current',
     requireAuth,
     async (req, res, next) => {
@@ -262,7 +339,7 @@ router.get('/current',
 
     router.get('/:spotId', async (req, res) => {
         const { spotId } = req.params;
-    
+
         const spot = await Spot.findByPk(spotId, {
             include: [
                 {
@@ -289,7 +366,7 @@ router.get('/current',
         });
         const numReviews = parseInt(reviews[0].dataValues.numReviews) || 0;
         const avgStarRating = parseFloat(reviews[0].dataValues.avgStarRating).toFixed(1) || null;
-    
+
         const spotDetails = {
             id: spot.id,
             ownerId: spot.ownerId,
@@ -313,10 +390,10 @@ router.get('/current',
                 lastName: spot.User.lastname
             }
         };
-    
+
         return res.status(200).json(spotDetails);
     });
-    
+
 router.get('/', async (req, res) => {
     try {
         const spots = await Spot.findAll({
