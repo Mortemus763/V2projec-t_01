@@ -1,7 +1,7 @@
 const express = require('express');
 const router = express.Router()
 
-const { check } = require('express-validator');
+const { check, query } = require('express-validator');
 const { handleValidationErrors, validateReview } = require('../../utils/validation');
 
 const { User, Spot, Review, SpotImage, ReviewImages, sequelize, Sequelize } = require('../../db/models');
@@ -43,6 +43,18 @@ const validateSpot = [
         .withMessage('Please provide price'),
     handleValidationErrors
 ]
+
+const queryParametersValidation = [
+    query('page').optional().notEmpty().isInt().withMessage("Please provide correct numberic not empty page"),
+    query('size').optional().notEmpty().isInt().withMessage("Please provide correct numberic not empty size"),
+    query('minLat').optional().notEmpty().isInt().withMessage("Please provide correct numberic not empty minLat"),
+    query('maxLat').optional().notEmpty().isInt().withMessage("Please provide correct numberic not empty maxLat"),
+    query('minLng').optional().notEmpty().isInt().withMessage("Please provide correct numberic not empty minLng"),
+    query('maxLng').optional().notEmpty().isInt().withMessage("Please provide correct numberic not empty maxLng"),
+    query('minPrice').optional().notEmpty().isInt().withMessage("Please provide correct numberic not empty minPrice"),
+    query('maxPrice').optional().notEmpty().isInt().withMessage("Please provide correct numberic not empty maxPrice"),
+    handleValidationErrors
+];
 
 //create a spot
 router.post('/',
@@ -395,48 +407,47 @@ router.get('/:spotId', async (req, res) => {
     return res.status(200).json(spotDetails);
 });
 
-router.get('/', async (req, res, next) => {
+router.get('/', queryParametersValidation, async (req, res, next) => {
     try {
         const where = {};
         //retrive filters criterias
-        let { page, size, minLat, maxLat, minLng, maxLng, minPrice, maxPrice } = req.params
+        let { page, size, minLat, maxLat, minLng, maxLng, minPrice, maxPrice } = req.query
         //validate filters
         page = parseInt(page)
         size = parseInt(size)
-        if (Number.isNaN(page)) page = 4
-        if (Number.isNaN(size)) size = 1
+        if (Number.isNaN(page)) page = 1
+        if (Number.isNaN(size)) size = 4
         if (minLat) {
             minLat = parseFloat(minLat)
             if (!Number.isNaN(minLat))
-                where.minLat = { [Op.gte]: minLat }
+                where.lat = { [Op.gte]: minLat }
         }
         if (maxLat) {
             minLat = parseFloat(maxLat)
             if (!Number.isNaN(maxLat))
-                where.maxLat = { [Op.lte]: maxLat }
+                where.lat = { [Op.lte]: maxLat }
         }
         if (minLng) {
             minLng = parseFloat(minLng)
             if (!Number.isNaN(minLng))
-                where.minLng = { [Op.gte]: minLng }
+                where.lng = { [Op.gte]: minLng }
         }
         if (maxLng) {
             maxLat = parseFloat(maxLng)
             if (!Number.isNaN(maxLng))
-                where.maxLat = { [Op.lte]: maxLng }
+                where.lng = { [Op.lte]: maxLng }
         }
         if (minPrice) {
             minPrice = parseFloat(minPrice)
             if (!Number.isNaN(minPrice))
-                where.minPrice = { [Op.lte]: minPrice }
+                where.price = { [Op.gte]: minPrice }
         }
         if (maxPrice) {
             maxPrice = parseFloat(maxPrice)
             if (!Number.isNaN(maxPrice))
-                where.maxPrice = { [Op.gte]: maxPrice }
+                where.price = { [Op.lte]: maxPrice }
         }
-        //set filters
-        console.log('where :>> ', where);
+
         const spots = await Spot.findAll({
             where,
             include: [
@@ -448,26 +459,30 @@ router.get('/', async (req, res, next) => {
                 },
                 {
                     model: Review,
-                    attributes: []
+                    attributes: ['stars']
                 }
             ],
-            attributes: {
-                include: [
-                    [
-                        sequelize.fn('AVG', sequelize.col('Reviews.stars')),
-                        'avgRating'
-                    ]
-                ]
-            },
-            group: ['Spot.id', 'SpotImages.url'],
+            //When this line is on then "SQLITE_ERROR: no such column: SpotImages.url"
+            // group: ['Spot.id', 'SpotImages.url'],
+            group: ['Spot.id'],
             limit: size,
             offset: size * (page - 1),
         });
+        // console.log('spots :>> ', spots[0].Reviews);
         const formattedSpots = spots.map(spot => {
             let previewImage = null;
 
             if (spot.SpotImages && spot.SpotImages.length > 0) {
                 previewImage = spot.SpotImages[0].url;
+            }
+
+            //calculate average
+            let avgRating = 0;
+            const ratings = spot.Reviews
+            if (ratings && ratings.length > 0) {
+                avgRating =
+                    ratings.map(review => parseFloat(review.stars))
+                        .reduce((acc, cur) => acc + cur) / ratings.length;
             }
 
             return {
@@ -484,7 +499,7 @@ router.get('/', async (req, res, next) => {
                 price: spot.price,
                 createdAt: spot.createdAt,
                 updatedAt: spot.updatedAt,
-                avgRating: parseFloat(spot.dataValues.avgRating).toFixed(1) || null,
+                avgRating: avgRating,
                 previewImage: previewImage
             };
         });
