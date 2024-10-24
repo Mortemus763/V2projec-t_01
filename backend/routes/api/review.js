@@ -7,6 +7,35 @@ const { handleValidationErrors, validateReview } = require('../../utils/validati
 const { User, Spot, Review, SpotImage, ReviewImages } = require('../../db/models');
 const { requireAuthorization, requireReviewAuthorization, requireAuth } = require('../../utils/auth');
 
+router.post('/:reviewId/images',
+    requireAuth,                    
+    requireReviewAuthorization,      
+    async (req, res, next) => {
+      const { reviewId } = req.params;
+      const { url } = req.body;
+  
+      try {
+        const imageCount = await ReviewImage.count({ where: { reviewId } });
+        if (imageCount >= 10) {
+          return res.status(403).json({
+            message: "Maximum number of images for this resource was reached"
+          });
+        }
+        const newImage = await ReviewImage.create({
+          reviewId,
+          url
+        });
+
+        return res.status(201).json({
+          id: newImage.id,
+          url: newImage.url
+        });
+  
+      } catch (error) {
+        next(error); 
+      }
+  });
+
 router.put('/:reviewId',
     requireAuth,
     requireReviewAuthorization,
