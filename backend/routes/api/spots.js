@@ -337,66 +337,76 @@ router.get('/current',
         }
     });
 
-    router.get('/:spotId', async (req, res) => {
-        const { spotId } = req.params;
+router.get('/:spotId', async (req, res) => {
+    const { spotId } = req.params;
 
-        const spot = await Spot.findByPk(spotId, {
-            include: [
-                {
-                    model: SpotImage,
-                    attributes: ['id', 'url', 'preview']
-                },
-                {
-                    model: User,
-                    attributes: ['id', 'firstname', 'lastname']
-                }
-            ]
-        });
-        if (!spot) {
-            return res.status(404).json({
-                message: "Spot couldn't be found"
-            });
-        }
-        const reviews = await Review.findAll({
-            where: { spotId: spot.id },
-            attributes: [
-                [sequelize.fn('COUNT', sequelize.col('id')), 'numReviews'], // Count reviews
-                [sequelize.fn('AVG', sequelize.col('stars')), 'avgStarRating'] // Average rating
-            ]
-        });
-        const numReviews = parseInt(reviews[0].dataValues.numReviews) || 0;
-        const avgStarRating = parseFloat(reviews[0].dataValues.avgStarRating).toFixed(1) || null;
-
-        const spotDetails = {
-            id: spot.id,
-            ownerId: spot.ownerId,
-            address: spot.address,
-            city: spot.city,
-            state: spot.state,
-            country: spot.country,
-            lat: parseFloat(spot.lat),
-            lng: parseFloat(spot.lng),
-            name: spot.name,
-            description: spot.description,
-            price: parseFloat(spot.price),
-            createdAt: spot.createdAt,
-            updatedAt: spot.updatedAt,
-            numReviews: numReviews,
-            avgStarRating: avgStarRating,
-            SpotImages: spot.SpotImages,
-            Owner: {
-                id: spot.User.id,
-                firstName: spot.User.firstname,
-                lastName: spot.User.lastname
+    const spot = await Spot.findByPk(spotId, {
+        include: [
+            {
+                model: SpotImage,
+                attributes: ['id', 'url', 'preview']
+            },
+            {
+                model: User,
+                attributes: ['id', 'firstname', 'lastname']
             }
-        };
-
-        return res.status(200).json(spotDetails);
+        ]
     });
+    if (!spot) {
+        return res.status(404).json({
+            message: "Spot couldn't be found"
+        });
+    }
+    const reviews = await Review.findAll({
+        where: { spotId: spot.id },
+        attributes: [
+            [sequelize.fn('COUNT', sequelize.col('id')), 'numReviews'], // Count reviews
+            [sequelize.fn('AVG', sequelize.col('stars')), 'avgStarRating'] // Average rating
+        ]
+    });
+    const numReviews = parseInt(reviews[0].dataValues.numReviews) || 0;
+    const avgStarRating = parseFloat(reviews[0].dataValues.avgStarRating).toFixed(1) || null;
+
+    const spotDetails = {
+        id: spot.id,
+        ownerId: spot.ownerId,
+        address: spot.address,
+        city: spot.city,
+        state: spot.state,
+        country: spot.country,
+        lat: parseFloat(spot.lat),
+        lng: parseFloat(spot.lng),
+        name: spot.name,
+        description: spot.description,
+        price: parseFloat(spot.price),
+        createdAt: spot.createdAt,
+        updatedAt: spot.updatedAt,
+        numReviews: numReviews,
+        avgStarRating: avgStarRating,
+        SpotImages: spot.SpotImages,
+        Owner: {
+            id: spot.User.id,
+            firstName: spot.User.firstname,
+            lastName: spot.User.lastname
+        }
+    };
+
+    return res.status(200).json(spotDetails);
+});
 
 router.get('/', async (req, res) => {
     try {
+        let { page, size, minLat, maxLat, minLng, maxLng, minPrice, maxPrice } = req.params
+        page = parseInt(page)
+        size = parseInt(size)
+        if (Number.isNaN(page)) page = 4
+        if (Number.isNaN(size)) size = 1
+
         const spots = await Spot.findAll({
+            where: {
+                limit: size,
+                offset: size * (page - 1)
+            },
             include: [
                 {
                     model: SpotImage,
@@ -404,7 +414,6 @@ router.get('/', async (req, res) => {
                     where: { preview: true },
                     required: false
                 },
-
                 {
                     model: Review,
                     attributes: []
