@@ -6,6 +6,7 @@ const { handleValidationErrors, validateReview } = require('../../utils/validati
 
 const { User, Spot, Review, SpotImage, ReviewImages, sequelize, Sequelize } = require('../../db/models');
 const { requireAuthorization, requireAuth } = require('../../utils/auth');
+const { Op } = Sequelize;
 
 const validateSpot = [
     check('address')
@@ -223,84 +224,84 @@ router.delete('/:spotId',
             next(err)
         }
     });
-    router.get('/:spotId/reviews', async (req, res, next) => {
-        const { spotId } = req.params;
+router.get('/:spotId/reviews', async (req, res, next) => {
+    const { spotId } = req.params;
 
-        try {
+    try {
 
-            const spot = await Spot.findByPk(spotId, {
-                include: [
-                    { model: SpotImage, attributes: ['id', 'url', 'preview'] },
-                    { model: User, attributes: ['id', 'firstname', 'lastname'] }
-                ]
+        const spot = await Spot.findByPk(spotId, {
+            include: [
+                { model: SpotImage, attributes: ['id', 'url', 'preview'] },
+                { model: User, attributes: ['id', 'firstname', 'lastname'] }
+            ]
+        });
+
+
+        if (!spot) {
+            return res.status(404).json({
+                message: "Spot couldn't be found"
             });
-
-
-            if (!spot) {
-                return res.status(404).json({
-                    message: "Spot couldn't be found"
-                });
-            }
-
-
-            const reviews = await Review.findAll({
-                where: { spotId: spot.id },
-                include: [
-                    { model: User, attributes: ['id', 'firstname', 'lastname'] },
-                    { model: ReviewImages, attributes: ['id', 'url'] }
-                ]
-            });
-
-
-            const numReviews = reviews.length;
-            const avgStarRating = reviews.reduce((sum, review) => sum + review.stars, 0) / (numReviews || 1);
-
-
-            const spotDetails = {
-                id: spot.id,
-                ownerId: spot.ownerId,
-                address: spot.address,
-                city: spot.city,
-                state: spot.state,
-                country: spot.country,
-                lat: parseFloat(spot.lat),
-                lng: parseFloat(spot.lng),
-                name: spot.name,
-                description: spot.description,
-                price: parseFloat(spot.price),
-                createdAt: spot.createdAt,
-                updatedAt: spot.updatedAt,
-                numReviews: numReviews,
-                avgStarRating: parseFloat(avgStarRating).toFixed(1),
-                SpotImages: spot.SpotImages,
-                Owner: {
-                    id: spot.User.id,
-                    firstName: spot.User.firstname,
-                    lastName: spot.User.lastname
-                },
-                Reviews: reviews.map(review => ({
-                    id: review.id,
-                    userId: review.userId,
-                    spotId: review.spotId,
-                    review: review.review,
-                    stars: review.stars,
-                    createdAt: review.createdAt,
-                    updatedAt: review.updatedAt,
-                    User: {
-                        id: review.User.id,
-                        firstName: review.User.firstname,
-                        lastName: review.User.lastname
-                    },
-                    ReviewImages: review.ReviewImages
-                }))
-            };
-
-
-            return res.status(200).json(spotDetails);
-        } catch (error) {
-            next(error);
         }
-    });
+
+
+        const reviews = await Review.findAll({
+            where: { spotId: spot.id },
+            include: [
+                { model: User, attributes: ['id', 'firstname', 'lastname'] },
+                { model: ReviewImages, attributes: ['id', 'url'] }
+            ]
+        });
+
+
+        const numReviews = reviews.length;
+        const avgStarRating = reviews.reduce((sum, review) => sum + review.stars, 0) / (numReviews || 1);
+
+
+        const spotDetails = {
+            id: spot.id,
+            ownerId: spot.ownerId,
+            address: spot.address,
+            city: spot.city,
+            state: spot.state,
+            country: spot.country,
+            lat: parseFloat(spot.lat),
+            lng: parseFloat(spot.lng),
+            name: spot.name,
+            description: spot.description,
+            price: parseFloat(spot.price),
+            createdAt: spot.createdAt,
+            updatedAt: spot.updatedAt,
+            numReviews: numReviews,
+            avgStarRating: parseFloat(avgStarRating).toFixed(1),
+            SpotImages: spot.SpotImages,
+            Owner: {
+                id: spot.User.id,
+                firstName: spot.User.firstname,
+                lastName: spot.User.lastname
+            },
+            Reviews: reviews.map(review => ({
+                id: review.id,
+                userId: review.userId,
+                spotId: review.spotId,
+                review: review.review,
+                stars: review.stars,
+                createdAt: review.createdAt,
+                updatedAt: review.updatedAt,
+                User: {
+                    id: review.User.id,
+                    firstName: review.User.firstname,
+                    lastName: review.User.lastname
+                },
+                ReviewImages: review.ReviewImages
+            }))
+        };
+
+
+        return res.status(200).json(spotDetails);
+    } catch (error) {
+        next(error);
+    }
+});
 router.get('/current',
     requireAuth,
     async (req, res, next) => {
@@ -394,19 +395,50 @@ router.get('/:spotId', async (req, res) => {
     return res.status(200).json(spotDetails);
 });
 
-router.get('/', async (req, res) => {
+router.get('/', async (req, res, next) => {
     try {
+        const where = {};
+        //retrive filters criterias
         let { page, size, minLat, maxLat, minLng, maxLng, minPrice, maxPrice } = req.params
+        //validate filters
         page = parseInt(page)
         size = parseInt(size)
         if (Number.isNaN(page)) page = 4
         if (Number.isNaN(size)) size = 1
-
+        if (minLat) {
+            minLat = parseFloat(minLat)
+            if (!Number.isNaN(minLat))
+                where.minLat = { [Op.gte]: minLat }
+        }
+        if (maxLat) {
+            minLat = parseFloat(maxLat)
+            if (!Number.isNaN(maxLat))
+                where.maxLat = { [Op.lte]: maxLat }
+        }
+        if (minLng) {
+            minLng = parseFloat(minLng)
+            if (!Number.isNaN(minLng))
+                where.minLng = { [Op.gte]: minLng }
+        }
+        if (maxLng) {
+            maxLat = parseFloat(maxLng)
+            if (!Number.isNaN(maxLng))
+                where.maxLat = { [Op.lte]: maxLng }
+        }
+        if (minPrice) {
+            minPrice = parseFloat(minPrice)
+            if (!Number.isNaN(minPrice))
+                where.minPrice = { [Op.lte]: minPrice }
+        }
+        if (maxPrice) {
+            maxPrice = parseFloat(maxPrice)
+            if (!Number.isNaN(maxPrice))
+                where.maxPrice = { [Op.gte]: maxPrice }
+        }
+        //set filters
+        console.log('where :>> ', where);
         const spots = await Spot.findAll({
-            where: {
-                limit: size,
-                offset: size * (page - 1)
-            },
+            where,
             include: [
                 {
                     model: SpotImage,
@@ -427,7 +459,9 @@ router.get('/', async (req, res) => {
                     ]
                 ]
             },
-            group: ['Spot.id', 'SpotImages.url']
+            group: ['Spot.id', 'SpotImages.url'],
+            limit: size,
+            offset: size * (page - 1),
         });
         const formattedSpots = spots.map(spot => {
             let previewImage = null;
@@ -457,8 +491,11 @@ router.get('/', async (req, res) => {
 
         return res.status(200).json({ Spots: formattedSpots });
     } catch (err) {
-        console.error(err);
-        return res.status(500).json({ error: 'Something went wrong' });
+        const error = new Error("Failed to get data")
+        error.status = 500
+        error.title = "Failed to get data"
+        error.errors = ({ error: err.message });
+        next(error)
     }
 });
 module.exports = router
