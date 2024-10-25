@@ -18,12 +18,14 @@ module.exports = {
      *   isBetaMember: false
      * }], {});
     */
-    const spot = await Spot.findOne();
-    const image = await SpotImage.create({
-      url: "some url",
-      preview: true
+    const spot = await Spot.findAll();
+    spot.forEach(async spot => {
+      const image = await SpotImage.create({
+        url: "some url",
+        preview: true
+      });
+      await spot.addSpotImage(image);
     })
-    await spot.addSpotImage(image);
   },
 
   async down(queryInterface, Sequelize) {

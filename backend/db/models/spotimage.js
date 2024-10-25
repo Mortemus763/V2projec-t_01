@@ -12,9 +12,12 @@ module.exports = (sequelize, DataTypes) => {
     static associate(models) {
       SpotImage.belongsTo(models.Spot, {
         foreignKey: 'spotId',
-        as: 'Spot',
-        onDelete: 'CASCADE',
-        hooks: true
+        //Why this alias was created?
+        // as: 'Spot',
+        //this cascade does ciclomatice reference which make destroy 
+        // to process forever
+        // onDelete: 'CASCADE',
+        // hooks: true
       });
     };
       // define association here

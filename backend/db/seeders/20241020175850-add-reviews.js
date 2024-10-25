@@ -1,6 +1,6 @@
 'use strict';
 
-const { User, Spot, Review, sequelize } = require('../models')
+const { User, Spot, Review } = require('../models')
 
 const options = {}
 if (process.env.NODE_ENV === 'production') {
@@ -20,22 +20,31 @@ module.exports = {
      *   isBetaMember: false
      * }], {});
     */
-    const spot = await Spot.findOne({
-      include: [{ model: User }]
-    })
-    const reviews = [{
-      review: "This is wanderful appatment. I'll return here next time.",
-      stars: 5,
-      userId: spot.User.id,
-      spotId: spot.id
-    }, {
-      review: "Not bad but I've seen better.",
-      stars: 3,
-      userId: spot.User.id,
-      spotId: spot.id
-    }];
-    reviews.forEach(async review => {
-      await Review.create(review)
+
+    //Get all spots with User
+    const spots = await Spot.findAll({
+      include: [{ model: User, required: true }]
+    });
+
+    //Define reviews
+    const reviews = [
+      {
+        review: "This is wanderful appatment. I'll return here next time.",
+        stars: 5,
+      },
+      {
+        review: "Not bad but I've seen better.",
+        stars: 3,
+      }
+    ];
+
+    //Creare reviews for each spot
+    spots.forEach(async spot => {
+      reviews.map(async review => {
+        review.spotId = spot.id;
+        review.userId = spot.User.id;
+        return await Review.create(review)
+      });
     });
   },
 
