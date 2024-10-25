@@ -1,6 +1,6 @@
 const jwt = require('jsonwebtoken');
 const { jwtConfig } = require('../config');
-const { User, Spot, Review } = require('../db/models');
+const { User, Spot, Review, SpotImage } = require('../db/models');
 
 const { secret, expiresIn } = jwtConfig;
 
@@ -121,5 +121,42 @@ const requireReviewAuthorization = async (req, res, next) => {
   }
 };
 
+const requireSpotImageAuthorization = async (req, res, next) => {
 
-module.exports = { setTokenCookie, restoreUser, requireAuth, requireAuthorization, requireReviewAuthorization };
+  const { imageId } = req.params;
+  const { id: userId } = req.user;
+
+  try {
+    const spotImage = await SpotImage.findByPk(imageId, {
+      include: [{ model: Spot }]
+    });
+    console.log('spotImage :>> ', spotImage);
+    if (!spotImage) {
+      const error = new Error("Not found")
+      error.status = 404
+      error.title = "Not found"
+      error.errors = { message: "not found" }
+      return next(error)
+    }
+
+    if (spotImage.Spot.ownerId !== userId) {
+      const err = new Error('Forbbiden');
+      err.title = 'Forbidden';
+      err.errors = { message: 'Forbidden' }
+      err.status = 403;
+      return next(err);
+    }
+    next();
+  } catch (error) {
+    next(error);
+  }
+};
+
+module.exports = {
+  setTokenCookie,
+  restoreUser,
+  requireAuth,
+  requireAuthorization,
+  requireReviewAuthorization,
+  requireSpotImageAuthorization
+};
