@@ -58,6 +58,7 @@ router.get('/current', requireAuth, async (req, res, next) => {
         const formatReviews = reviews.map(review => {
             const spot = review.Spot;
             const previewImage = spot.SpotImages.length ? spot.SpotImages[0].url : null;
+            const reviewImages = review.ReviewImages.length ? review.ReviewImages : [{ id: null, url: 'https://via.placeholder.com/150' }];
 
             return {
               id: review.id,
