@@ -34,23 +34,23 @@ router.post(
           }
         }
       });
-  
+
       if (!user || !bcrypt.compareSync(password, user.hashedPassword.toString())) {
         return res.status(401).json({
           message: "Invalid credentials"
         });
       }
-  
+
       const safeUser = {
         id: user.id,
-        firstName: user.firstName, 
-        lastName: user.lastName,
+        firstName: user.firstname,
+        lastName: user.lastname,
         email: user.email,
         username: user.username,
       };
-  
+
       await setTokenCookie(res, safeUser);
-  
+
       return res.status(200).json({
         user: safeUser
       });
