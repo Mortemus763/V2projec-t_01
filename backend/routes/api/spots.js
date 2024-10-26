@@ -345,7 +345,7 @@ router.get('/current',
                 }
             });
 
-            return res.json({Spots: spots})
+            return res.json({ Spots: spots })
 
         } catch (error) {
             const err = new Error("Failed to get data");
@@ -422,7 +422,7 @@ router.get('/', queryParametersValidation, async (req, res, next) => {
         page = parseInt(page)
         size = parseInt(size)
         if (Number.isNaN(page)) page = 1
-        if (Number.isNaN(size)) size = 4
+        if (Number.isNaN(size)) size = 20
         if (minLat) {
             minLat = parseFloat(minLat)
             if (!Number.isNaN(minLat))
@@ -510,7 +510,7 @@ router.get('/', queryParametersValidation, async (req, res, next) => {
             };
         });
 
-        return res.status(200).json({ Spots: formattedSpots });
+        return res.status(200).json({ Spots: formattedSpots, page: page, size: size });
     } catch (err) {
         const error = new Error("Failed to get data")
         error.status = 500
