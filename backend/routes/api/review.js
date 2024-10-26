@@ -8,20 +8,20 @@ const { User, Spot, Review, SpotImage, ReviewImages } = require('../../db/models
 const { requireAuthorization, requireReviewAuthorization, requireAuth } = require('../../utils/auth');
 
 router.post('/:reviewId/images',
-    requireAuth,                    
-    requireReviewAuthorization,      
+    requireAuth,
+    requireReviewAuthorization,
     async (req, res, next) => {
       const { reviewId } = req.params;
       const { url } = req.body;
-  
+
       try {
-        const imageCount = await ReviewImage.count({ where: { reviewId } });
+        const imageCount = await ReviewImages.count({ where: { reviewId } });
         if (imageCount >= 10) {
           return res.status(403).json({
             message: "Maximum number of images for this resource was reached"
           });
         }
-        const newImage = await ReviewImage.create({
+        const newImage = await ReviewImages.create({
           reviewId,
           url
         });
@@ -30,9 +30,9 @@ router.post('/:reviewId/images',
           id: newImage.id,
           url: newImage.url
         });
-  
+
       } catch (error) {
-        next(error); 
+        next(error);
       }
   });
 
@@ -112,7 +112,7 @@ router.get('/current', requireAuth, async (req, res, next) => {
         const formatReviews = reviews.map(review => {
             const spot = review.Spot;
             const previewImage = spot.SpotImages.length ? spot.SpotImages[0].url : null;
-            const reviewImages = review.ReviewImages.length ? review.ReviewImages : [{ id: null, url: 'https://via.placeholder.com/150' }];
+            //const ReviewImage = review.ReviewImages.length ? review.ReviewImages : [{ id: null, url: 'https://via.placeholder.com/150' }];
 
             return {
                 id: review.id,
