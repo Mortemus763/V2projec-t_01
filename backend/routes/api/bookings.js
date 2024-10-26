@@ -4,7 +4,7 @@ const router = express.Router()
 const { check } = require('express-validator');
 const { handleValidationErrors, validateReview } = require('../../utils/validation');
 
-const { User, Spot, Review, SpotImage, ReviewImages, Booking } = require('../../db/models');
+const { User, Spot, Review, SpotImage, ReviewImage, Booking } = require('../../db/models');
 const { requireAuthorization, requireReviewAuthorization, requireAuth } = require('../../utils/auth');
 
 
