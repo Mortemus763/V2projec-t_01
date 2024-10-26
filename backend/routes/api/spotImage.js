@@ -12,7 +12,7 @@ router.delete('/:imageId',
             const { imageId } = req.params
             const spotImage = await SpotImage.findByPk(imageId)
             await spotImage.destroy()
-            return res.json({ message: "seccess" });
+            return res.json({ message: "Successfully deleted" });
         } catch (error) {
             const err = new Error("Falied to delete")
             err.status = 500

@@ -130,12 +130,11 @@ const requireSpotImageAuthorization = async (req, res, next) => {
     const spotImage = await SpotImage.findByPk(imageId, {
       include: [{ model: Spot }]
     });
-    console.log('spotImage :>> ', spotImage);
     if (!spotImage) {
-      const error = new Error("Not found")
+      const error = new Error("Spot Image couldn't be found")
       error.status = 404
-      error.title = "Not found"
-      error.errors = { message: "not found" }
+      error.title = "Spot Image couldn't be found"
+      error.errors = { message: "Spot Image couldn't be found" }
       return next(error)
     }
 
