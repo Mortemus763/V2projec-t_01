@@ -1,5 +1,5 @@
 const express = require('express');
-const { ReviewImages, Review } = require('../../db/models');
+const { ReviewImage, Review } = require('../../db/models');
 const { requireAuth } = require('../../utils/auth');
 const router = express.Router();
 
@@ -8,12 +8,12 @@ router.delete("/:imageId", requireAuth, async (req, res) => {
   const {id} = req.user;
   const {imageId} = req.params;
 
-  const imageWithReview = await ReviewImages.findOne({
+  const imageWithReview = await ReviewImage.findOne({
       where: {id: imageId},
       include: {model: Review}
   });
 
-  const imageToDelete = await ReviewImages.findByPk(imageId);
+  const imageToDelete = await ReviewImage.findByPk(imageId);
 
   if (imageToDelete){
       if (id === imageWithReview.Reviews.userId){
