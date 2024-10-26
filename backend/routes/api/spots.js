@@ -29,6 +29,10 @@ const validateSpot = [
         .exists({ checkFalsy: true })
         .notEmpty()
         .withMessage('Please provide lat'),
+    check('lng')
+        .exists({ checkFalsy: true })
+        .notEmpty()
+        .withMessage('Please provide lng'),
     check('name')
         .exists({ checkFalsy: true })
         .notEmpty()
@@ -58,6 +62,7 @@ const queryParametersValidation = [
 
 //create a spot
 router.post('/',
+    requireAuth,
     validateSpot,
     async (req, res, next) => {
 
@@ -176,6 +181,7 @@ router.post('/:spotId/reviews',
     });
 
 router.put('/:spotId',
+    requireAuth,
     validateSpot,
     requireAuthorization,
     async (req, res, next) => {
@@ -339,7 +345,7 @@ router.get('/current',
                 }
             });
 
-            return res.json(spots)
+            return res.json({Spots: spots})
 
         } catch (error) {
             const err = new Error("Failed to get data");
