@@ -475,6 +475,9 @@ router.get('/', queryParametersValidation, async (req, res, next) => {
             offset: size * (page - 1),
         });
         // console.log('spots :>> ', spots[0].Reviews);
+        if (spots.length === 0) {
+            return res.status(200).json({ Spots: [], page, size }); // Return empty array
+        }
         const formattedSpots = spots.map(spot => {
             let previewImage = null;
 
