@@ -23,9 +23,12 @@ module.exports = {
       address: '111 Main St',
       city: "Atlanta",
       state: 'GA',
+      country: "US",
       name: 'Appartment',
       price: 99.00,
-      description: "Comfortable 1br appertments in downtown"
+      description: "Comfortable 1br appertments in downtown",
+      lat: 10.01,
+      lng: 23.1
     },
     {
       address: "5500 Park St",
