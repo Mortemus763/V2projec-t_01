@@ -505,7 +505,7 @@ router.get('/', queryParametersValidation, async (req, res, next) => {
                 lng: parseFloat(spot.lng),
                 name: spot.name,
                 description: spot.description,
-                price: spot.price,
+                price: parseFloat(spot.price),
                 createdAt: spot.createdAt,
                 updatedAt: spot.updatedAt,
                 avgRating: avgRating,
