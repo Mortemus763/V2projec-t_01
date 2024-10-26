@@ -8,6 +8,7 @@ const handleValidationErrors = (req, _res, next) => {
 
   if (!validationErrors.isEmpty()) {
     const errors = {};
+    console.log('validationErrors :>> ', validationErrors);
     validationErrors
       .array()
       .forEach(error => errors[error.path] = error.msg);
@@ -29,6 +30,7 @@ const validateReview = [
   check('stars')
     .exists({ checkFalsy: true })
     .notEmpty()
+    .isFloat({ min: 0, max: 5 })
     .withMessage('Please provide rating'),
   handleValidationErrors
 ];

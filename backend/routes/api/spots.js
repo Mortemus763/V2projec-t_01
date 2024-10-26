@@ -146,20 +146,20 @@ router.post('/:spotId/reviews',
             //Check if spot exist
             const spot = await Spot.findByPk(spotId)
             if (!spot) {
-                const error = new Error("Not found")
-                error.title = "Not found"
+                const error = new Error("Spot couldn't be found")
+                error.title = "Spot couldn't be found"
                 error.status = 404
-                error.errors = { message: "Spot not found" }
+                error.errors = { message: "Spot couldn't be found" }
                 return next(error)
             }
 
             //Check if review exist
             const isReviewExist = await Review.findOne({ where: { spotId, userId } })
             if (isReviewExist) {
-                const error = new Error("Forbiden")
-                error.status = 403
-                error.title = "Forbiden"
-                error.errors = { message: "Forbiden to create review" }
+                const error = new Error("User already has a review for this spot")
+                error.status = 500
+                error.title = "User already has a review for this spot"
+                error.errors = { message: "User already has a review for this spot" }
                 return next(error)
             }
 
