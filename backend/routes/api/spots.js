@@ -342,7 +342,8 @@ router.get('/current',
                         [Sequelize.fn('avg', Sequelize.col('Reviews.stars')), 'avgRating'],
                         [Sequelize.col('SpotImages.preview'), 'previewImage']
                     ]
-                }
+                },
+                group: ['Spot.id'],
             });
 
             return res.json({ Spots: spots })
