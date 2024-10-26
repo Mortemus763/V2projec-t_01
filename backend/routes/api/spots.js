@@ -4,7 +4,7 @@ const router = express.Router()
 const { check, query } = require('express-validator');
 const { handleValidationErrors, validateReview } = require('../../utils/validation');
 
-const { User, Spot, Review, SpotImage, ReviewImages, sequelize, Sequelize } = require('../../db/models');
+const { User, Spot, Review, SpotImage, ReviewImage, sequelize, Sequelize } = require('../../db/models');
 const { requireAuthorization, requireAuth } = require('../../utils/auth');
 const { Op } = Sequelize;
 
@@ -260,7 +260,7 @@ router.get('/:spotId/reviews', async (req, res, next) => {
             where: { spotId: spot.id },
             include: [
                 { model: User, attributes: ['id', 'firstname', 'lastname'] },
-                { model: ReviewImages, attributes: ['id', 'url'] }
+                { model: ReviewImage, attributes: ['id', 'url'] }
             ]
         });
 

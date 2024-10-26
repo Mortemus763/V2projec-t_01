@@ -4,7 +4,7 @@ const router = express.Router()
 const { check } = require('express-validator');
 const { handleValidationErrors, validateReview } = require('../../utils/validation');
 
-const { User, Spot, Review, SpotImage, ReviewImages } = require('../../db/models');
+const { User, Spot, Review, SpotImage, ReviewImage } = require('../../db/models');
 const { requireAuthorization, requireReviewAuthorization, requireAuth } = require('../../utils/auth');
 
 router.post('/:reviewId/images',
@@ -104,7 +104,7 @@ router.get('/current', requireAuth, async (req, res, next) => {
                     ]
                 },
                 {
-                    model: ReviewImages,
+                    model: ReviewImage,
                     attributes: ['id', 'url']
                 }
             ]
