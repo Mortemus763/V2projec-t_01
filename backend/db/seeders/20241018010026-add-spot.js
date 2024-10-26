@@ -1,9 +1,12 @@
 'use strict';
-const { User, Spot } = require('../models')
-const options = { tableName: 'Spots' }
+
+const options = { tableName: "Spots" };
 if (process.env.NODE_ENV === 'production') {
-  options.schema = process.env.SCHEMA
+  options.schema = process.env.SCHEMA;  // define your schema in options object
 }
+
+const { User, Spot } = require('../models')
+
 /** @type {import('sequelize-cli').Migration} */
 module.exports = {
   async up(queryInterface, Sequelize) {
