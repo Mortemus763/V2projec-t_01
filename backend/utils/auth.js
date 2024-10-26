@@ -101,10 +101,10 @@ const requireReviewAuthorization = async (req, res, next) => {
   try {
     const review = await Review.findByPk(reviewId);
     if (!review) {
-      const error = new Error("Not found")
+      const error = new Error("Review couldn't be found")
       error.status = 404
-      error.title = "Not found"
-      error.errors = { message: "not found" }
+      error.title = "Review couldn't be found"
+      error.errors = { message: "Review couldn't be found" }
       return next(error)
     }
 

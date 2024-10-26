@@ -70,7 +70,7 @@ router.delete('/:reviewId',
             const { reviewId } = req.params
             const review = await Review.findByPk(reviewId)
             await review.destroy()
-            return res.json({ message: "success" })
+            return res.json({ message: "Successfully deleted" })
 
         } catch (error) {
             const err = new Error("Failed to delete")
