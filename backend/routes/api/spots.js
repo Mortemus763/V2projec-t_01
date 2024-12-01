@@ -5,7 +5,7 @@ const { check, query } = require('express-validator');
 const { handleValidationErrors, validateReview } = require('../../utils/validation');
 
 const { User, Spot, Review, SpotImage, ReviewImage, sequelize, Sequelize } = require('../../db/models');
-const { requireAuthorization, requireAuth } = require('../../utils/auth');
+const { requireAuthorization, requireAuth, requireNotOwnerAuthorization } = require('../../utils/auth');
 const { Op } = Sequelize;
 
 const validateSpot = [
@@ -60,6 +60,118 @@ const queryParametersValidation = [
     handleValidationErrors
 ];
 
+router.get('/:spotId/bookings', requireAuth, requireAuthorization, async (req, res, next) => {
+    const { spotId } = req.params;
+
+    try {
+        // Fetch bookings for the spot 
+        const bookings = await Booking.findAll({
+            where: { spotId },
+            include: [{ model: User, attributes: ['id', 'firstName', 'lastName'] }],
+        });
+
+        // Prepare the response with full booking details
+        const response = {
+            Bookings: bookings.map(booking => ({
+                id: booking.id,
+                spotId: booking.spotId,
+                userId: booking.userId,
+                startDate: booking.startDate,
+                endDate: booking.endDate,
+                createdAt: booking.createdAt,
+                updatedAt: booking.updatedAt,
+                User: {
+                    id: booking.User.id,
+                    firstName: booking.User.firstName,
+                    lastName: booking.User.lastName,
+                },
+            })),
+        };
+
+        return res.status(200).json(response);
+    } catch (error) {
+        next(error);
+    }
+});
+
+router.post('/:spotId/bookings', requireAuth, requireNotOwnerAuthorization, async (req, res, next) => {
+    const { spotId } = req.params;
+    const userId = req.user.id;
+    const { startDate, endDate } = req.body;
+
+    const t = await sequelize.transaction();
+
+    try {
+        const spot = await Spot.findByPk(spotId);
+        if (!spot) {
+            return res.status(404).json({ message: "Spot couldn't be found" });
+        }
+        // Validate date inputs
+        const today = new Date();
+        const start = new Date(startDate);
+        const end = new Date(endDate);
+
+        if (start < today) {
+            await t.rollback();
+            return res.status(400).json({
+                message: "Bad Request",
+                errors: { startDate: "startDate cannot be in the past" },
+            });
+        }
+        if (end <= start) {
+            await t.rollback();
+            return res.status(400).json({
+                message: "Bad Request",
+                errors: { endDate: "endDate cannot be on or before startDate" },
+            });
+        }
+
+        // Check for booking conflicts
+        const existingBookings = await Booking.findAll({
+            where: {
+                spotId,
+                [Op.or]: [
+                    { startDate: { [Op.between]: [startDate, endDate] } },
+                    { endDate: { [Op.between]: [startDate, endDate] } },
+                    { startDate: { [Op.lte]: startDate }, endDate: { [Op.gte]: endDate } },
+                ],
+            },
+            transaction: t,
+        });
+
+        if (existingBookings.length > 0) {
+            await t.rollback();
+            return res.status(403).json({
+                message: "Sorry, this spot is already booked for the specified dates",
+                errors: {
+                    startDate: "Start date conflicts with an existing booking",
+                    endDate: "End date conflicts with an existing booking",
+                },
+            });
+        }
+
+        // Create new booking
+        const newBooking = await Booking.create(
+            {
+                spotId,
+                userId,
+                startDate,
+                endDate,
+            },
+            { transaction: t }
+        );
+
+        // Commit the transaction
+        await t.commit();
+
+        // Send the response
+        return res.status(201).json(newBooking);
+    } catch (error) {
+        // Rollback the transaction in case of an error
+        await t.rollback();
+        next(error);
+    }
+});
 //create a spot
 router.post('/',
     requireAuth,
@@ -523,4 +635,6 @@ router.get('/', queryParametersValidation, async (req, res, next) => {
         next(error)
     }
 });
+
+
 module.exports = router
