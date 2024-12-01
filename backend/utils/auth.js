@@ -151,11 +151,40 @@ const requireSpotImageAuthorization = async (req, res, next) => {
   }
 };
 
+const requireNotOwnerAuthorization = async (req, res, next) => {
+  const { spotId } = req.params;
+  const userId = req.user.id;
+
+  try {
+      const spot = await Spot.findByPk(spotId);
+      if (!spot) {
+          const err = new Error("Spot couldn't be found");
+          err.status = 404;
+          return next(err);
+      }
+
+      // Check if the user owns the spot
+      if (spot.ownerId === userId) {
+          const err = new Error('Forbidden');
+          err.message = "You cannot book your own spot";
+          err.status = 403;
+          return next(err);
+      }
+
+      // Add spot to the request object for reuse in the route
+      req.spot = spot;
+      next();
+  } catch (error) {
+      next(error);
+  }
+};
+
 module.exports = {
   setTokenCookie,
   restoreUser,
   requireAuth,
   requireAuthorization,
   requireReviewAuthorization,
-  requireSpotImageAuthorization
+  requireSpotImageAuthorization,
+  requireNotOwnerAuthorization
 };
