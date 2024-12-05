@@ -11,6 +11,7 @@ body {
     margin: 50px auto;
     padding: 20px;
     background: #ffffff;
+
     border-radius: 8px;
   }
   
@@ -74,9 +75,6 @@ body {
     background: #cccccc;
     cursor: not-allowed;
   }
-  
-
-
   
     h1 {
       font-size: 20px;
