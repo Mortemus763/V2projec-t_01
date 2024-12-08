@@ -1,9 +1,9 @@
 .spot-detail-page {
     display: flex;
     flex-direction: column;
-    align-items: center;
+    align-items: flex-start;
     max-width: 1000px;
-    margin: 20px auto;
+    margin: 10px;
   }
   
   h1 {
@@ -53,19 +53,73 @@
     display: flex;
     justify-content: space-between;
     align-items: center;
+    margin-top: 10px;
+  }
+  
+  .price-box button {
+    padding: 8px 16px;
+    background-color: #FF5A5F;
+    color: white;
+    border: none;
+    border-radius: 30px;
+    cursor: pointer;
+  }
+  
+  .price-box button:hover {
+    background-color: #D15D5D;
+  }
+  
+  /* Reviews Section */
+  .reviews-section {
+    margin-top: 40px;
+  }
+  
+  .reviews-list {
     margin-top: 20px;
   }
   
-  button {
-    background-color: #FF5A5F;
-    color: white;
-    padding: 10px 20px;
-    border: none;
-    border-radius: 5px;
-    cursor: pointer;
+  .review-item {
+    margin-bottom: 20px;
+    border-bottom: 1px solid #ddd;
+    padding-bottom: 10px;
+  }
+  
+  .review-item p {
     font-size: 16px;
   }
   
-  button:hover {
-    opacity: 0.8;
+  .review-item strong {
+    font-weight: bold;
+  }
+  
+  /* Review Form */
+  textarea {
+    width: 100%;
+    height: 150px;
+    margin-bottom: 10px;
+    padding: 10px;
+    border: 1px solid #ddd;
+    border-radius: 8px;
+    font-size: 16px;
+  }
+  
+  select {
+    padding: 10px;
+    font-size: 16px;
+    margin-bottom: 20px;
+    border-radius: 8px;
+    border: 1px solid #ddd;
+  }
+  
+  button[type="submit"] {
+    background-color: #FF5A5F;
+    color: white;
+    border: none;
+    border-radius: 30px;
+    padding: 10px 20px;
+    cursor: pointer;
+  }
+  
+  button[type="submit"]:hover {
+    background-color: #D15D5D;
   }

@@ -1,5 +1,6 @@
 import { useEffect, useState } from 'react';
 import { useParams } from 'react-router-dom';
+import ReviewForm from '../ReviewForm/ReviewForm'; 
 import './SpotDetail.css'; // Add custom CSS for styling
 
 function SpotDetail() {
@@ -37,6 +38,7 @@ function SpotDetail() {
           ))}
         </div>
       </div>
+
       <div className="spot-info">
         <p>Hosted by {spot.Owner.firstName} {spot.Owner.lastName}</p>
         <p>{spot.description}</p>
@@ -44,6 +46,29 @@ function SpotDetail() {
           <span>{`$${spot.price} per night`}</span>
           <button onClick={handleReserve}>Reserve</button>
         </div>
+      </div>
+
+      {/* Review Section */}
+      <div className="reviews-section">
+        <h3>
+          Reviews: 
+          {spot.numReviews === 0 ? "Be the first to post a review!" : `Average Rating: ${spot.avgStarRating} · ${spot.numReviews} Review${spot.numReviews > 1 ? "s" : ""}`}
+        </h3>
+        {spot.Reviews && spot.Reviews.length > 0 ? (
+          <div className="reviews-list">
+            {spot.Reviews.map((review) => (
+              <div key={review.id} className="review-item">
+                <p><strong>{review.User.firstName} {review.User.lastName}</strong> - {new Date(review.createdAt).toLocaleString('en-us', { month: 'long', year: 'numeric' })}</p>
+                <p>{review.review}</p>
+              </div>
+            ))}
+          </div>
+        ) : (
+          <p>No reviews yet.</p>
+        )}
+        
+        {/* Review Form - Show this if the user is logged in */}
+        <ReviewForm spotId={spotId} />
       </div>
     </div>
   );

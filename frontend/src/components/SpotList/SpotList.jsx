@@ -22,7 +22,11 @@ const SpotList = () => {
               <h2 className="spot-name" title={spot.name}>{spot.name}</h2>
               <p className="spot-location">{spot.city}, {spot.state}</p>
               <p className="spot-price">${spot.price} / night</p>
-              <p className="spot-rating">{spot.avgStarRating} stars</p>
+              <div className="spot-rating">
+                <span className="star-icon">★</span>
+                {spot.avgStarRating === "New" ? "New" : spot.avgStarRating} 
+                {spot.numReviews ? ` · ${spot.numReviews} Review${spot.numReviews > 1 ? "s" : ""}` : ""}
+              </div>
             </div>
           </Link>
         ))
