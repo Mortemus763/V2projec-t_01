@@ -1,0 +1,71 @@
+.spot-detail-page {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    max-width: 1000px;
+    margin: 20px auto;
+  }
+  
+  h1 {
+    font-size: 2rem;
+    color: #333;
+  }
+  
+  h2 {
+    font-size: 1.5rem;
+    color: #666;
+  }
+  
+  .spot-images {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    margin-bottom: 20px;
+  }
+  
+  .main-image {
+    width: 100%;
+    max-width: 600px;
+    height: auto;
+    margin-bottom: 10px;
+  }
+  
+  .thumbnail-images {
+    display: flex;
+    justify-content: center;
+    gap: 10px;
+  }
+  
+  .thumbnail {
+    width: 80px;
+    height: 80px;
+    object-fit: cover;
+    border-radius: 5px;
+  }
+  
+  .spot-info {
+    text-align: center;
+    max-width: 800px;
+    margin: 20px 0;
+  }
+  
+  .price-box {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-top: 20px;
+  }
+  
+  button {
+    background-color: #FF5A5F;
+    color: white;
+    padding: 10px 20px;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    font-size: 16px;
+  }
+  
+  button:hover {
+    opacity: 0.8;
+  }
