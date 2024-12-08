@@ -25,45 +25,111 @@ a:hover {
   text-decoration: underline;
 }
 
-button {
-  background-color: #999999;
-  color: #FFFFFF;
+
+.navigation {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 10px 20px;
+  border-bottom: 1px solid #ddd;
+}
+
+
+.dropdown-container {
+  position: relative;
+  display: inline-block; /* Keeps the dropdown in place */  
+}
+
+.dropdown-toggle {
+  background: transparent;
+  border: none;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+  border-radius: 30px;
+  font-size: 15px;
+  background-color: white;
   padding: 10px 15px;
-  border: 1px solid #000000;
-  border-radius: 5px;
-  font-size: 14px;
+  border-radius: 30px;
+  font-size: 15px;
   cursor: pointer;
 }
-
-button:hover {
-  opacity: 0.9;
+.dropdown-toggle:hover {
+  background-color: rgba(0, 0, 0, 0.05); /* Add a subtle background on hover */
 }
 
-.profile-dropdown {
+.menu-icon {
+  margin-right: 8px; /* Space between the menu icon and the user icon */
+}
+
+/* Dropdown Menu Styles */
+.dropdown-menu {
   position: absolute;
-  top: 70px;
-  right: 20px;
-  background-color: #FFFFFF;
-  border: 1px solid #CCCCCC;
-  border-radius: 5px;
-  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-  padding: 10px;
-  display: none;
-}
-
-.profile-dropdown.visible {
+  right: 0;
+  top: 45px;
+  border: 1px solid #ddd;
+  background: white;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+  border-radius: 10px;
+  padding: 15px 20px; /* Adjust padding to make the menu look more balanced */
+  list-style: none;
+  width: 200px; /* Set a fixed width to the dropdown */
   display: block;
 }
 
-.profile-dropdown li {
-  margin-bottom: 10px;
+.dropdown-menu li:hover {
+  background-color: #f4f4f4; /* Slight hover effect */
 }
 
-.profile-dropdown button {
-  width: 100%;
-  background-color: #999999;
-  color: #FFFFFF;
-  padding: 8px;
-  border-radius: 5px;
-  font-size: 14px;
+/* Button Style for Log In and Sign Up */
+.dropdown-menu button {
+  background: transparent;
+  color: black;
+  text-align: left;
+  font-size: 17px;
+  background-color: white;
+  padding: 10px 15px;
+  border-radius: 0;
+  cursor: pointer;
+  border: none;
+  box-shadow: none;
+  transition: background-color 0.3s ease, opacity 0.3s ease;
+}
+
+/* When hovering over the button */
+.dropdown-menu button:hover {
+  background-color: whitesmoke; /* Background color on hover */
+  opacity: 1; /* Full opacity on hover */
+  color: black;
+}
+
+.dropdown-menu button:focus {
+  outline: none;
+}
+.logo-container {
+  display: flex;
+  align-items: center;  /* Aligns text and icon vertically */
+  gap: 8px;             /* Adds space between the icon and text */
+  text-decoration: none;
+}
+
+.logo-text {
+  font-size: 22px; /* Adjust the size of the text to fit your design */
+  color: rgb(243, 63, 63);  /* You can change the color as needed */
+  text-decoration: none;
+}
+button {
+  background-color: white;
+  border: 1px solid rgb(243, 63, 63);
+  padding: 10px 15px;
+  font-size: 15px;
+  cursor: pointer;
+  box-shadow: 2px 2px 8px rgba(0, 0, 0, 0.1);
+  color: rgb(243, 63, 63);
+}
+
+button:hover {
+background-color: rgb(243, 63, 63);
+ color: white;
 }
