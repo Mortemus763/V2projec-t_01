@@ -18,10 +18,15 @@ module.exports = {
      *   isBetaMember: false
      * }], {});
     */
+    const urls = [
+      "url1",
+      "url2",
+      "url3",
+    ]
     const spot = await Spot.findAll();
-    spot.forEach(async spot => {
+    spot.forEach(async (spot, i) => {
       const image = await SpotImage.create({
-        url: "some url",
+        url: urls[i],
         preview: true
       });
       await spot.addSpotImage(image);

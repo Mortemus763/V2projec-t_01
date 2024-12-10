@@ -59,7 +59,32 @@ router.post(
     }
   }
 );
+router.post('/demo', async (req, res, next) => {
+  try {
+    const demoUser = await User.findOne({
+      where: { username: 'Demo-lition' },
+    });
 
+    if (!demoUser) {
+      return res.status(404).json({ message: 'Demo user not found' });
+    }
+
+    const safeUser = {
+      id: demoUser.id,
+      firstName: demoUser.firstname,
+      lastName: demoUser.lastname,
+      email: demoUser.email,
+      username: demoUser.username,
+    };
+
+    await setTokenCookie(res, safeUser);
+
+    return res.status(200).json({ user: safeUser });
+  } catch (error) {
+    console.error('Error in demo login route:', error);
+    return res.status(500).json({ message: 'Internal server error' });
+  }
+});
 // Log out
 router.delete(
   '/',

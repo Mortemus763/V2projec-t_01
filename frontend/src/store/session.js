@@ -74,4 +74,19 @@ export const logout = () => async (dispatch) => {
     dispatch(removeUser());
     return response;
 };
+
+export const demoLogin = () => async (dispatch) => {
+  const res = await csrfFetch('/api/session/demo', {
+    method: 'POST',
+  });
+
+  if (res.ok) {
+    const data = await res.json();
+    dispatch(setUser(data.user)); // Dispatch the user data to set the session
+    return res;
+  }
+
+  const errorData = await res.json();
+  throw new Error(errorData.message || 'Demo login failed');
+};
 export default sessionReducer;

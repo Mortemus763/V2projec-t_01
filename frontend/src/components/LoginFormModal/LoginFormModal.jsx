@@ -14,19 +14,32 @@ function LoginFormModal() {
   const handleSubmit = (e) => {
     e.preventDefault();
     setErrors({});
-    return dispatch(sessionActions.login({ credential, password }))
-      .then(closeModal)
-      .catch(async (res) => {
-        const data = await res.json();
-        if (data && data.errors) {
-          setErrors(data.errors);
-        }
-      });
+    dispatch(sessionActions.login({ credential, password }))
+    .then(() => {
+      closeModal(); 
+    })
+    .catch(async (res) => {
+      const data = await res.json();
+      if (data.errors && data.errors.includes("Invalid credentials")) {
+        setErrors({ credential: "The provided credentials were invalid." });
+      } else {
+        setErrors({ credential: "Unknown error occurred, please try again." });
+      }
+    });
   };
-
+  const handleDemoLogin = () => {
+    dispatch(sessionActions.demoLogin()) // Dispatch the demo login action
+    .then(closeModal)  // Close the modal after successful login
+    .catch((error) => {
+      setErrors({ credential: "Demo login failed. Please try again." });
+      console.error('Demo login error:', error);  // Log any errors in the frontend
+    });
+  };
+  const isDisabled = credential.length < 4 || password.length < 6;
   return (
     <>
       <h1>Log In</h1>
+      
       <form onSubmit={handleSubmit}>
         <label>
           Username or Email
@@ -46,11 +59,10 @@ function LoginFormModal() {
             required
           />
         </label>
-        {errors.credential && (
-          <p>{errors.credential}</p>
-        )}
-        <button type="submit">Log In</button>
+         {errors.credential && <p className="error-message">{errors.credential}</p>}
+        <button type="submit" disabled={isDisabled}>Log In</button>
       </form>
+      <a href="#" onClick={handleDemoLogin} className="demo-user-link">Demo User</a>
     </>
   );
 }

@@ -1,6 +1,6 @@
 import { useState, useEffect, useRef } from 'react';
 import { useDispatch } from 'react-redux';
-import { FaUserCircle } from 'react-icons/fa';
+import { Link } from 'react-router-dom';
 import * as sessionActions from '../../store/session';
 import OpenModalMenuItem from './OpenModalMenuItem';
 import LoginFormModal from '../LoginFormModal/LoginFormModal';
@@ -10,12 +10,7 @@ function ProfileButton({ user }) {
     const dispatch = useDispatch();
     const [showMenu, setShowMenu] = useState(false);
     const ulRef = useRef();
-  
-    const toggleMenu = (e) => {
-      e.stopPropagation(); // Keep from bubbling up to document and triggering closeMenu
-      setShowMenu(!showMenu);
-    };
-  
+    
     useEffect(() => {
       if (!showMenu) return;
   
@@ -37,24 +32,26 @@ function ProfileButton({ user }) {
       dispatch(sessionActions.logout());
       closeMenu();
     };
-  
-    const ulClassName = "profile-dropdown" + (showMenu ? "" : " hidden");
+    const ulClassName = `profile-dropdown ${showMenu ? "visible" : "hidden"}`;
   
     return (
-      <>
-        <button onClick={toggleMenu}>
-          <FaUserCircle />
-        </button>
-        <ul className={ulClassName} ref={ulRef}>
-          {user ? (
-            <>
-              <li>{user.username}</li>
-              <li>{user.firstName} {user.lastName}</li>
-              <li>{user.email}</li>
-              <li>
-                <button onClick={logout}>Log Out</button>
-              </li>
-            </>
+    <>
+      <ul className={ulClassName} ref={ulRef}>
+        {user ? (
+          <>
+            <li className="greeting">Hello, {user.firstName}</li>
+            <li className="user-info">
+              <p><strong>Email:</strong> {user.email}</p>
+            </li>
+            <li>
+              <Link to="/manage-spots" className="manage-spots-link">
+                Manage Spots
+              </Link>
+            </li>
+            <li>
+              <button onClick={logout} className="logout-button">Log Out</button>
+            </li>
+          </>
           ) : (
             <>
               <OpenModalMenuItem

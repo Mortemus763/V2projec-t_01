@@ -1,125 +1,160 @@
 .spot-detail-page {
-    display: flex;
-    flex-direction: column;
-    align-items: flex-start;
-    max-width: 1000px;
-    margin: 10px;
-  }
-  
-  h1 {
-    font-size: 2rem;
-    color: #333;
-  }
-  
-  h2 {
-    font-size: 1.5rem;
-    color: #666;
-  }
-  
-  .spot-images {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    margin-bottom: 20px;
-  }
-  
-  .main-image {
-    width: 100%;
-    max-width: 600px;
-    height: auto;
-    margin-bottom: 10px;
-  }
-  
-  .thumbnail-images {
-    display: flex;
-    justify-content: center;
-    gap: 10px;
-  }
-  
-  .thumbnail {
-    width: 80px;
-    height: 80px;
-    object-fit: cover;
-    border-radius: 5px;
-  }
-  
-  .spot-info {
-    text-align: center;
-    max-width: 800px;
-    margin: 20px 0;
-  }
-  
-  .price-box {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    margin-top: 10px;
-  }
-  
-  .price-box button {
-    padding: 8px 16px;
-    background-color: #FF5A5F;
-    color: white;
-    border: none;
-    border-radius: 30px;
-    cursor: pointer;
-  }
-  
-  .price-box button:hover {
-    background-color: #D15D5D;
-  }
-  
-  /* Reviews Section */
-  .reviews-section {
-    margin-top: 40px;
-  }
-  
-  .reviews-list {
-    margin-top: 20px;
-  }
-  
-  .review-item {
-    margin-bottom: 20px;
-    border-bottom: 1px solid #ddd;
-    padding-bottom: 10px;
-  }
-  
-  .review-item p {
-    font-size: 16px;
-  }
-  
-  .review-item strong {
-    font-weight: bold;
-  }
-  
-  /* Review Form */
-  textarea {
-    width: 100%;
-    height: 150px;
-    margin-bottom: 10px;
-    padding: 10px;
-    border: 1px solid #ddd;
-    border-radius: 8px;
-    font-size: 16px;
-  }
-  
-  select {
-    padding: 10px;
-    font-size: 16px;
-    margin-bottom: 20px;
-    border-radius: 8px;
-    border: 1px solid #ddd;
-  }
-  
-  button[type="submit"] {
-    background-color: #FF5A5F;
-    color: white;
-    border: none;
-    border-radius: 30px;
-    padding: 10px 20px;
-    cursor: pointer;
-  }
-  
-  button[type="submit"]:hover {
-    background-color: #D15D5D;
-  }
+  max-width: 1000px;
+  margin: 20px auto;
+  padding: 20px;
+  font-family: Arial, sans-serif;
+}
+
+.spot-header h1 {
+  font-size: 2rem;
+  font-weight: bold;
+  color: #333;
+}
+
+.spot-header h2 {
+  font-size: 1.2rem;
+  color: #666;
+  margin-bottom: 20px;
+}
+
+/* Images Section */
+.spot-images {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.main-image {
+  width: 100%;
+  height: auto;
+  border-radius: 8px;
+}
+
+.thumbnail-images {
+  display: flex;
+  gap: 10px;
+}
+
+.thumbnail {
+  width: 100px;
+  height: 100px;
+  border-radius: 8px;
+  object-fit: cover;
+  border: 1px solid #ddd;
+}
+
+/* Content Container */
+.content-container {
+  display: flex;
+  justify-content: space-between;
+  margin-top: 20px;
+}
+
+.spot-info {
+  flex: 2;
+  padding-right: 20px;
+  font-size: 1rem;
+  color: #444;
+}
+
+.spot-info p {
+  color: #000; /* Set to black */
+  font-size: 16px;
+  margin: 10px 0;
+}
+
+.reserve-box {
+  flex: 1;
+  padding: 20px;
+  border: 1px solid #ddd;
+  border-radius: 8px;
+  text-align: center;
+  background-color: #f9f9f9;
+}
+
+.reserve-box .price {
+  font-size: 1.5rem;
+  font-weight: bold;
+  color: #FF5A5F;
+}
+
+.reserve-box .per-night {
+  font-size: 1rem;
+  color: #666;
+}
+
+.reserve-box button {
+  margin-top: 10px;
+  padding: 10px 20px;
+  background-color: #FF5A5F;
+  color: white;
+  border: none;
+  border-radius: 20px;
+  cursor: pointer;
+  font-size: 1rem;
+}
+
+.reserve-box button:hover {
+  background-color: #D15D5D;
+}
+
+.rating {
+  margin-top: 10px;
+  font-size: 1rem;
+  color: #666;
+}
+
+/* Reviews Section */
+.reviews-section {
+  margin-top: 40px;
+}
+
+.reviews-list {
+  margin-top: 20px;
+}
+
+.review-item {
+  border-bottom: 1px solid #ddd;
+  padding: 10px 0;
+}
+
+.review-item p {
+  margin: 5px 0;
+  color: #444;
+}
+
+.review-item strong {
+  font-weight: bold;
+}
+
+/* Review Form */
+textarea {
+  width: 100%;
+  height: 100px;
+  padding: 10px;
+  border: 1px solid #ddd;
+  border-radius: 8px;
+  font-size: 1rem;
+  margin-bottom: 10px;
+}
+
+select {
+  padding: 8px;
+  border: 1px solid #ddd;
+  border-radius: 8px;
+  margin-bottom: 10px;
+}
+
+button[type="submit"] {
+  background-color: #FF5A5F;
+  color: white;
+  border: none;
+  border-radius: 20px;
+  padding: 10px 20px;
+  font-size: 1rem;
+  cursor: pointer;
+}
+
+button[type="submit"]:hover {
+  background-color: #D15D5D;
+}

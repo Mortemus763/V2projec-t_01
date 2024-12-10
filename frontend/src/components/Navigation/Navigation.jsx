@@ -1,5 +1,5 @@
 import { NavLink } from 'react-router-dom';
-import { useSelector } from 'react-redux';
+import { useSelector, useDispatch } from 'react-redux';
 import { useState } from 'react';
 import ProfileButton from './ProfileButton';
 import OpenModalButton from '../OpenModalButton/OpenModalButton';
@@ -8,17 +8,33 @@ import SignupFormModal from '../SignupFormModal/SignupFormModal';
 import { FaUserCircle } from "react-icons/fa";
 import { TfiMenu } from "react-icons/tfi";
 import { SiAirbnb } from "react-icons/si";
+import * as sessionActions from '../../store/session';
+
 import './Navigation.css';
 
 function Navigation({ isLoaded }) {
   const sessionUser = useSelector((state) => state.session.user);
+  const dispatch = useDispatch();
   const [showDropdown, setShowDropdown] = useState(false);
   const toggleDropdown = () => setShowDropdown((prev) => !prev);
 
   const sessionLinks = sessionUser ? (
-    <li>
-      <ProfileButton user={sessionUser} />
-    </li>
+    <div className="dropdown-container">
+    <button className="dropdown-toggle" onClick={toggleDropdown}>
+    <TfiMenu size={24} className="menu-icon" color="black" />
+    <FaUserCircle size={24} color="black"/>
+    </button>
+    {showDropdown && (
+      <ul className="dropdown-menu">
+        <li>
+          <ProfileButton user={sessionUser} />
+        </li>
+        <li>
+          <button onClick={() => dispatch(sessionActions.logout())}>Log Out</button>
+        </li>
+      </ul>
+    )}
+  </div>
   ) : (
     <div className="dropdown-container">
       <button className="dropdown-toggle" onClick={toggleDropdown}>
