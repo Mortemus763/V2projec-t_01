@@ -1,15 +1,31 @@
 import { useState, useEffect, useRef } from 'react';
 import { useDispatch } from 'react-redux';
-import { Link } from 'react-router-dom';
 import * as sessionActions from '../../store/session';
-import OpenModalMenuItem from './OpenModalMenuItem';
+import { FaUserCircle } from "react-icons/fa";
+import { TfiMenu } from "react-icons/tfi";
+import OpenModalButton from '../OpenModalButton/OpenModalButton';
 import LoginFormModal from '../LoginFormModal/LoginFormModal';
 import SignupFormModal from '../SignupFormModal/SignupFormModal';
+import { Link } from 'react-router-dom';
 
 function ProfileButton({ user }) {
     const dispatch = useDispatch();
     const [showMenu, setShowMenu] = useState(false);
+    const [loading, setLoading] = useState(true);
     const ulRef = useRef();
+    useEffect(() => {
+      // Simulate a loading period for user data
+      if (user) {
+        setLoading(false); // Stop loading when user is available
+      } else {
+        setLoading(true); // Show loading if user is not defined
+      }
+    }, [user]);
+
+    const toggleMenu = (e) => {
+      e.stopPropagation(); // Keep from bubbling up to document and triggering closeMenu
+      setShowMenu(!showMenu);
+    };
     
     useEffect(() => {
       if (!showMenu) return;
@@ -35,35 +51,43 @@ function ProfileButton({ user }) {
     const ulClassName = `profile-dropdown ${showMenu ? "visible" : "hidden"}`;
   
     return (
-    <>
-      <ul className={ulClassName} ref={ulRef}>
-        {user ? (
-          <>
-            <li className="greeting">Hello, {user.firstName}</li>
-            <li className="user-info">
-              <p><strong>Email:</strong> {user.email}</p>
-            </li>
-            <li>
-              <Link to="/manage-spots" className="manage-spots-link">
-                Manage Spots
-              </Link>
-            </li>
-            <li>
-              <button onClick={logout} className="logout-button">Log Out</button>
-            </li>
-          </>
+      <>
+        <button className="dropdown-toggle" onClick={toggleMenu}>
+          <TfiMenu size={24} className="menu-icon" color="black" />
+          <FaUserCircle size={24} color="black" />
+        </button>
+        <ul className={ulClassName} ref={ulRef}>
+          {loading ? ( // Show a loading message while user is loading
+            <li>Loading...</li>
+          ) : user ? ( // Show user details if available
+            <>
+              <li className="greeting">Hello, {user.firstName}</li>
+              <li className="user-info">{user.email}</li>
+              <li>
+                <Link to="/manage-spots" className="manage-spots-link">
+                  Manage Spots
+                </Link>
+              </li>
+              <li>
+                <button onClick={logout} className="logout-button">
+                  Log Out
+                </button>
+              </li>
+            </>
           ) : (
             <>
-              <OpenModalMenuItem
-                itemText="Log In"
-                onItemClick={closeMenu}
-                modalComponent={<LoginFormModal />}
-              />
-              <OpenModalMenuItem
-                itemText="Sign Up"
-                onItemClick={closeMenu}
-                modalComponent={<SignupFormModal />}
-              />
+              <li>
+                <OpenModalButton
+                  buttonText="Log In"
+                  modalComponent={<LoginFormModal />}
+                />
+              </li>
+              <li>
+                <OpenModalButton
+                  buttonText="Sign Up"
+                  modalComponent={<SignupFormModal />}
+                />
+              </li>
             </>
           )}
         </ul>
