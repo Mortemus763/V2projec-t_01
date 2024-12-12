@@ -1,11 +1,14 @@
 import { useEffect, useState } from 'react';
 import { useParams } from 'react-router-dom';
-import ReviewForm from '../ReviewForm/ReviewForm'; 
+import { useSelector } from 'react-redux';
+import ReviewFormModal from '../ReviewFormModal/ReviewFormModal'; 
+import OpenModalButton from '../OpenModalButton/OpenModalButton';
 import './SpotDetail.css'; // Add custom CSS for styling
 
 function SpotDetail() {
   const { spotId } = useParams(); // Get spot ID from URL
   const [spot, setSpot] = useState(null);
+  const sessionUser = useSelector((state) => state.session.user);
 
   useEffect(() => {
     const fetchSpotDetails = async () => {
@@ -80,9 +83,11 @@ function SpotDetail() {
         ) : (
           <p>No reviews yet.</p>
         )}
-
-        {/* Review Form */}
-        <ReviewForm spotId={spotId} />
+          <OpenModalButton
+          buttonText="Post Your Review"
+          modalComponent={<ReviewFormModal spotId={spotId} />}
+        />
+        {!sessionUser && <p>Please log in to post a review.</p>}
       </div>
     </div>
   );

@@ -1,0 +1,40 @@
+.review-form-modal {
+  text-align: center;
+}
+
+.review-form-modal h1 {
+  font-size: 1.5rem;
+  margin-bottom: 20px;
+}
+
+.review-form-modal textarea {
+  width: 100%;
+  height: 100px;
+  margin-bottom: 10px;
+  padding: 10px;
+  border: 1px solid #ddd;
+  border-radius: 5px;
+}
+
+.stars-select {
+  margin-top: 10px;
+  padding: 10px;
+}
+
+.submit-review-button {
+  background: #ff5a5f;
+  color: white;
+  padding: 10px 15px;
+  border: none;
+  border-radius: 5px;
+  cursor: pointer;
+}
+
+.submit-review-button:hover {
+  background: #e13a3a;
+}
+
+.error-text {
+  color: red;
+  font-size: 0.9rem;
+}
