@@ -38,7 +38,12 @@ function Navigation({ isLoaded }) {
       </NavLink>
       <div className="dropdown-container">
       {sessionUser ? (
-        <ProfileButton user={sessionUser} />
+     <div className="nav-actions">
+     <NavLink to="/spots/new" className="create-spot-link">
+       Create a New Spot
+     </NavLink>
+     <ProfileButton user={sessionUser} />
+   </div>
       ) : (
         <>
           <button className="dropdown-toggle" onClick={toggleDropdown}>

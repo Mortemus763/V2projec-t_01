@@ -61,7 +61,7 @@ function ProfileButton({ user }) {
             <li>Loading...</li>
           ) : user ? ( // Show user details if available
             <>
-              <li className="greeting">Hello, {user.firstName}</li>
+              <li className="greeting">Hello, {user.firstname}</li>
               <li className="user-info">{user.email}</li>
               <li>
                 <Link to="/manage-spots" className="manage-spots-link">

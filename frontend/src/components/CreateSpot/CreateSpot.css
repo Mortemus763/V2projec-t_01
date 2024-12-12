@@ -1,0 +1,6 @@
+.create-spot-container {
+  max-width: 800px; /* Increase width for a spacious layout */
+  margin: 0 auto; /* Center the form on the page */
+  padding: 20px;
+  background-color: white;
+}
