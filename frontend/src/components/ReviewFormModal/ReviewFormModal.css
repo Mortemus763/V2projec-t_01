@@ -38,3 +38,20 @@
   color: red;
   font-size: 0.9rem;
 }
+.star-rating {
+  display: flex;
+  gap: 5px;
+}
+.star {
+  font-size: 30px;
+  color: #ddd; /* Hollow star color */
+  transition: color 0.2s ease;
+}
+
+.star.filled {
+  color: #FF5A5F; /* Filled star color */
+}
+
+.star:hover {
+  color: #FF5A5F; /* Highlighted star on hover */
+}

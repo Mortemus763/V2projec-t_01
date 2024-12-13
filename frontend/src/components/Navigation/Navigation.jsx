@@ -23,10 +23,10 @@ function Navigation({ isLoaded }) {
     );
   } else {
     sessionLinks = (
-      <>
+      <div className="auth-buttons-container">
         <OpenModalButton buttonText="Log In" modalComponent={<LoginFormModal />} />
         <OpenModalButton buttonText="Sign Up" modalComponent={<SignupFormModal />} />
-      </>
+      </div>
     );
   }
 

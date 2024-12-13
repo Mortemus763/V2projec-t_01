@@ -41,8 +41,9 @@ a:hover {
 }
 
 .dropdown-toggle {
+  width: 100%;
   background: transparent;
-  border: none;
+  border: 1px black !important;
   cursor: pointer;
   display: flex;
   align-items: center;
@@ -55,7 +56,8 @@ a:hover {
   cursor: pointer;
 }
 .dropdown-toggle:hover {
-  background-color: rgba(0, 0, 0, 0.05); /* Add a subtle background on hover */
+  background-color: whitesmoke !important; /* Add a subtle background on hover */
+  color: none;
 }
 
 .menu-icon {
@@ -118,17 +120,16 @@ a:hover {
   color: rgb(243, 63, 63);  /* You can change the color as needed */
   text-decoration: none;
 }
-button {
+.navigation button {
   background-color: white;
   border: 1px solid rgb(243, 63, 63);
   padding: 10px 15px;
   font-size: 15px;
   cursor: pointer;
-  box-shadow: 2px 2px 8px rgba(0, 0, 0, 0.1);
   color: rgb(243, 63, 63);
 }
 
-button:hover {
+.navigation button:hover {
 background-color: rgb(243, 63, 63);
  color: white;
 }
@@ -147,7 +148,9 @@ background-color: rgb(243, 63, 63);
   text-align: center;
   min-height: 160px; /* Set a maximum height */
 }
-
+.profile-dropdown:hover{
+  background-color: whitesmoke;
+}
 .profile-dropdown.visible {
   display: block;
 }
@@ -201,4 +204,21 @@ background-color: rgb(243, 63, 63);
   display: flex;
   align-items: center; /* Vertically aligns items */
   gap: 15px; /* Adds spacing between the link and the ProfileButton */
+}
+.auth-buttons-container {
+  gap: 10px;
+}
+.auth-buttons-container button {
+  width: 100%;
+  color: black; /* Text color */
+  border: none;
+  padding: 10px 15px;
+  font-size: 15px;
+  box-shadow: none;
+  cursor: pointer;
+  transition: background-color 0.3s ease, color 0.3s ease; /* Smooth hover effect */
+}
+.auth-buttons-container button:hover {
+  background-color: whitesmoke; /* Background color on hover */
+  color: black; /* Text color remains black on hover */
 }

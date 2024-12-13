@@ -2,10 +2,12 @@ import { useState } from "react";
 import { useDispatch } from "react-redux";
 import * as sessionActions from "../../store/session";
 import { useModal } from '../../context/Modal';
+import { FaStar, FaRegStar } from "react-icons/fa";
 
 function ReviewForm({ spotId }) {
   const [reviewText, setReviewText] = useState("");
-  const [stars, setStars] = useState(1);
+  const [stars, setStars] = useState(0);
+  const [hoverStars, setHoverStars] = useState(0);
   const dispatch = useDispatch();
   const { closeModal } = useModal();
 
@@ -40,10 +42,16 @@ function ReviewForm({ spotId }) {
           {[...Array(5)].map((_, index) => (
             <span
               key={index}
-              className={stars > index ? 'star filled' : 'star'}
+              onMouseEnter={() => setHoverStars(index + 1)}
+              onMouseLeave={() => setHoverStars(0)}
               onClick={() => setStars(index + 1)}
+              style={{ cursor: 'pointer' }}
             >
-              ★
+              {hoverStars > index || stars > index ? (
+                <FaStar color="#FF5A5F" size={30} />
+              ) : (
+                <FaRegStar color="#ddd" size={30} />
+              )}
             </span>
           ))}
         </div>

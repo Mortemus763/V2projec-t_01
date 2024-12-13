@@ -37,7 +37,7 @@ function LoginFormModal() {
   };
   const isDisabled = credential.length < 4 || password.length < 6;
   return (
-    <>
+    <div className="login-form-container">
       <h1>Log In</h1>
       
       <form onSubmit={handleSubmit}>
@@ -63,7 +63,7 @@ function LoginFormModal() {
         <button type="submit" disabled={isDisabled}>Log In</button>
       </form>
       <a href="#" onClick={handleDemoLogin} className="demo-user-link">Demo User</a>
-    </>
+    </div>
   );
 }
 
