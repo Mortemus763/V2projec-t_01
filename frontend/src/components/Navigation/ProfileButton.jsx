@@ -53,8 +53,8 @@ function ProfileButton({ user }) {
     return (
       <>
         <button className="dropdown-toggle" onClick={toggleMenu}>
-          <TfiMenu size={24} className="menu-icon" color="black" />
-          <FaUserCircle size={24} color="black" />
+          <TfiMenu size={24} className="menu-icon" color="gray" />
+          <FaUserCircle size={24} color="gray" />
         </button>
         <ul className={ulClassName} ref={ulRef}>
           {loading ? ( // Show a loading message while user is loading
