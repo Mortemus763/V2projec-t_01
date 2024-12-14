@@ -64,13 +64,12 @@ module.exports = {
       lng: 23.1
     },
     ];
-    const user = await User.findOne({
-      where: { username: "FakeUser1" }
-    });
-    spots.map(async spot => {
+    const users = await User.findAll(); // Get all users
+    spots.map(async (spot, index) => {
       const newSpot = await Spot.create(spot);
-      await user.addSpot(newSpot)
-    })
+      const assignedUser = users[index % users.length]; // Cycle through users
+      await assignedUser.addSpot(newSpot);
+    });
   },
 
   async down(queryInterface, Sequelize) {

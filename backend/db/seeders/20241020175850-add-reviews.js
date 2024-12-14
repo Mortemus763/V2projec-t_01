@@ -21,30 +21,25 @@ module.exports = {
     */
 
     //Get all spots with User
-    const spots = await Spot.findAll({
-      include: [{ model: User, required: true }]
-    });
+    const spots = await Spot.findAll();
+    const users = await User.findAll();
 
-    //Define reviews
     const reviews = [
-      {
-        review: "This is wanderful appatment. I'll return here next time.",
-        stars: 5,
-      },
-      {
-        review: "Not bad but I've seen better.",
-        stars: 3,
-      }
+      { review: "Amazing place, loved it!", stars: 5 },
+      { review: "Decent place, but could improve.", stars: 3 },
+      { review: "Not worth the price.", stars: 2 },
+      { review: "Absolutely fantastic experience!", stars: 5 },
     ];
 
-    //Creare reviews for each spot
-    spots.forEach(async spot => {
-      reviews.map(async review => {
-        review.spotId = spot.id;
-        review.userId = spot.User.id;
-        return await Review.create(review)
-      });
-    });
+    for (const [index, spot] of spots.entries()) {
+      for (const [reviewIndex, review] of reviews.entries()) {
+        await Review.create({
+          ...review,
+          spotId: spot.id,
+          userId: users[(index + reviewIndex) % users.length].id, // Assign users in a round-robin fashion
+        });
+      }
+    }
   },
 
   async down(queryInterface, Sequelize) {
