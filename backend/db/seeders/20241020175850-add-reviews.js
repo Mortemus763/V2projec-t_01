@@ -24,22 +24,46 @@ module.exports = {
     const spots = await Spot.findAll();
     const users = await User.findAll();
 
+    // Ensure there are enough users to assign reviews
+    if (users.length < 2) {
+      throw new Error("You need at least 2 users for reviews.");
+    }
+
     const reviews = [
-      { review: "Amazing place, loved it!", stars: 5 },
-      { review: "Decent place, but could improve.", stars: 3 },
+      { review: "Amazing spot, had a great time!", stars: 5 },
+      { review: "It was okay, could have been cleaner.", stars: 3 },
       { review: "Not worth the price.", stars: 2 },
-      { review: "Absolutely fantastic experience!", stars: 5 },
+      { review: "Fantastic location and very cozy!", stars: 5 },
+      { review: "Disappointing stay, amenities were lacking.", stars: 1 }
     ];
 
-    for (const [index, spot] of spots.entries()) {
-      for (const [reviewIndex, review] of reviews.entries()) {
-        await Review.create({
-          ...review,
+    // Assign reviews only to specific spots and users
+    const reviewEntries = [];
+
+    spots.forEach((spot, index) => {
+      // For each spot, add 1-2 reviews by different users
+      reviewEntries.push(
+        {
+          userId: users[0].id, // User 1
           spotId: spot.id,
-          userId: users[(index + reviewIndex) % users.length].id, // Assign users in a round-robin fashion
-        });
-      }
-    }
+          review: reviews[index % reviews.length].review,
+          stars: reviews[index % reviews.length].stars,
+          createdAt: new Date(),
+          updatedAt: new Date(),
+        },
+        {
+          userId: users[1].id, // User 2
+          spotId: spot.id,
+          review: reviews[(index + 1) % reviews.length].review,
+          stars: reviews[(index + 1) % reviews.length].stars,
+          createdAt: new Date(),
+          updatedAt: new Date(),
+        }
+      );
+    });
+
+    // Insert reviews into the database
+    await queryInterface.bulkInsert(options, reviewEntries, {});
   },
 
   async down(queryInterface, Sequelize) {

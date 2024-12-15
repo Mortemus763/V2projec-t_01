@@ -354,84 +354,50 @@ router.delete('/:spotId',
             next(err)
         }
     });
-router.get('/:spotId/reviews', async (req, res, next) => {
-    const { spotId } = req.params;
-
-    try {
-
-        const spot = await Spot.findByPk(spotId, {
-            include: [
-                { model: SpotImage, attributes: ['id', 'url', 'preview'] },
-                { model: User, attributes: ['id', 'firstname', 'lastname'] }
-            ]
-        });
-
-
-        if (!spot) {
-            return res.status(404).json({
-                message: "Spot couldn't be found"
+    router.get('/:spotId/reviews', async (req, res, next) => {
+        const { spotId } = req.params;
+    
+        try {
+            // Check if the spot exists
+            const spot = await Spot.findByPk(spotId);
+    
+            if (!spot) {
+                return res.status(404).json({
+                    message: "Spot couldn't be found"
+                });
+            }
+    
+            // Fetch reviews for the spot
+            const reviews = await Review.findAll({
+                where: { spotId: spot.id },
+                include: [
+                    { model: User, attributes: ['id', 'firstname', 'lastname'] },
+                    { model: ReviewImage, attributes: ['id', 'url'] }
+                ]
             });
+    
+            // Send reviews only
+            return res.status(200).json({
+                Reviews: reviews.map(review => ({
+                    id: review.id,
+                    userId: review.userId,
+                    spotId: review.spotId,
+                    review: review.review,
+                    stars: review.stars,
+                    createdAt: review.createdAt,
+                    updatedAt: review.updatedAt,
+                    User: {
+                        id: review.User.id,
+                        firstName: review.User.firstname,
+                        lastName: review.User.lastname
+                    },
+                    ReviewImages: review.ReviewImages
+                }))
+            });
+        } catch (error) {
+            next(error);
         }
-
-
-        const reviews = await Review.findAll({
-            where: { spotId: spot.id },
-            include: [
-                { model: User, attributes: ['id', 'firstname', 'lastname'] },
-                { model: ReviewImage, attributes: ['id', 'url'] }
-            ]
-        });
-
-
-        const numReviews = reviews.length;
-        const avgStarRating = reviews.reduce((sum, review) => sum + review.stars, 0) / (numReviews || 1);
-
-
-        const spotDetails = {
-            id: spot.id,
-            ownerId: spot.ownerId,
-            address: spot.address,
-            city: spot.city,
-            state: spot.state,
-            country: spot.country,
-            lat: parseFloat(spot.lat),
-            lng: parseFloat(spot.lng),
-            name: spot.name,
-            description: spot.description,
-            price: parseFloat(spot.price),
-            createdAt: spot.createdAt,
-            updatedAt: spot.updatedAt,
-            numReviews: numReviews,
-            avgStarRating: parseFloat(avgStarRating).toFixed(1),
-            SpotImages: spot.SpotImages,
-            Owner: {
-                id: spot.User.id,
-                firstName: spot.User.firstname,
-                lastName: spot.User.lastname
-            },
-            Reviews: reviews.map(review => ({
-                id: review.id,
-                userId: review.userId,
-                spotId: review.spotId,
-                review: review.review,
-                stars: review.stars,
-                createdAt: review.createdAt,
-                updatedAt: review.updatedAt,
-                User: {
-                    id: review.User.id,
-                    firstName: review.User.firstname,
-                    lastName: review.User.lastname
-                },
-                ReviewImages: review.ReviewImages
-            }))
-        };
-
-
-        return res.status(200).json(spotDetails);
-    } catch (error) {
-        next(error);
-    }
-});
+    });
 router.get('/current',
     requireAuth,
     async (req, res, next) => {
