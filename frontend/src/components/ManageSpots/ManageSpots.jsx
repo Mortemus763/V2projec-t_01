@@ -1,6 +1,8 @@
 import { useEffect, useState } from "react";
 import { useSelector } from "react-redux";
 import { useNavigate } from "react-router-dom";
+import OpenModalButton from "../OpenModalButton/OpenModalButton";
+import DeleteSpotModal from "../DeleteSpot/DeleteSpot";
 import "./ManageSpots.css";
 
 function ManageSpots() {
@@ -21,15 +23,10 @@ function ManageSpots() {
   const handleUpdate = (spotId) => {
     navigate(`/spots/${spotId}/edit`);
   };
-  
-  const handleDelete = async (spotId) => {
-    const confirmDelete = window.confirm(
-      "Are you sure you want to delete this spot?"
-    );
-    if (confirmDelete) {
-      await fetch(`/api/spots/${spotId}`, { method: "DELETE" });
-      setSpots((prevSpots) => prevSpots.filter((spot) => spot.id !== spotId));
-    }
+
+  const handleTileClick = (spotId) => {
+    // Navigate to SpotDetail page when a tile is clicked
+    navigate(`/spots/${spotId}`);
   };
 
   if (!sessionUser) return <p>Please log in to manage your spots.</p>;
@@ -40,7 +37,10 @@ function ManageSpots() {
       {spots.length === 0 ? (
         <div className="no-spots">
           <p>You have not created any spots yet.</p>
-          <button onClick={() => navigate.push("/spots/new")} className="create-spot-button">
+          <button
+            onClick={() => navigate("/spots/new")}
+            className="create-spot-button"
+          >
             Create a New Spot
           </button>
         </div>
@@ -50,7 +50,7 @@ function ManageSpots() {
             <div
               key={spot.id}
               className="spot-tile"
-              onClick={() => navigate.push(`/spots/${spot.id}`)}
+              onClick={() => handleTileClick(spot.id)} // Navigate to SpotDetail
             >
               <img
                 src={spot.previewImage || "/placeholder.jpg"}
@@ -78,15 +78,24 @@ function ManageSpots() {
                 >
                   Update
                 </button>
-                <button
-                  onClick={(e) => {
-                    e.stopPropagation();
-                    handleDelete(spot.id);
+                {/* OpenModalButton for Deletion */}
+                <OpenModalButton className="custom-delete-button"
+                   // Ensures proper styling
+                  buttonText="Delete"
+                  modalComponent={
+                    <DeleteSpotModal
+                      spotId={spot.id}
+                      onDelete={() =>
+                        setSpots((prevSpots) =>
+                          prevSpots.filter((s) => s.id !== spot.id)
+                        )
+                      }
+                    />
+                  }
+                  onButtonClick={(e) => {
+                    if (e) e.stopPropagation(); // Ensure `e` is defined before calling
                   }}
-                  className="delete-button"
-                >
-                  Delete
-                </button>
+                />
               </div>
             </div>
           ))}

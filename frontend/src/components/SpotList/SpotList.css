@@ -6,7 +6,12 @@
     margin: 0 auto;
     max-width: 1200px;
   }
-  
+  .spot-list .spot-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+  }
+
   /* Style for each spot tile */
   .spot-tile {
     display: flex;
@@ -15,7 +20,7 @@
     border: 1px solid #ddd;
     border-radius: 10px;
     overflow: hidden;
-    text-decoration: none;
+    text-decoration: none !important;
     box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
     transition: transform 0.3s ease, box-shadow 0.3s ease;
   }
@@ -39,6 +44,7 @@
     display: flex;
     flex-direction: column;
     justify-content: space-between;
+    text-decoration: none;
   }
   
   /* Spot name styling */
@@ -49,17 +55,15 @@
     margin-bottom: 10px;
     text-decoration: none;
     transition: color 0.3s ease;
+    text-decoration: none;
   }
-  
-  .spot-name:hover {
-    color: #ff5a5f; /* Change color on hover */
-  }
-  
+    
   /* Location styling */
   .spot-location {
     font-size: 14px;
     color: #777;
     margin-bottom: 10px;
+    text-decoration: none;
   }
   
   /* Price styling */
@@ -68,26 +72,28 @@
     font-weight: bold;
     color: #333;
     margin-bottom: 10px;
+    text-decoration: none;
   }
   
   /* Rating container styling */
   .spot-rating {
-    font-size: 14px;
-    color: #f5a623; /* Gold color for stars */
     display: flex;
     align-items: center;
+    gap: 5px;
+    font-size: 14px;
+    text-decoration: none;
   }
   
-  /* Star icon */
   .star-icon {
-    margin-right: 5px;
     font-size: 18px;
+    text-decoration: none;
   }
   
   /* "New" text for spots without reviews */
   .spot-rating span {
     font-style: italic;
     color: #888;
+    text-decoration: none;
   }
   
   /* Responsive adjustments for small screens */

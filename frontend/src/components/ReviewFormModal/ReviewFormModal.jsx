@@ -1,33 +1,30 @@
 import { useState } from "react";
 import { useDispatch } from "react-redux";
-import * as sessionActions from "../../store/session";
+import { addReview } from "../../store/reviews"; // Import from spot.js
 import { useModal } from '../../context/Modal';
 import { FaStar, FaRegStar } from "react-icons/fa";
 
-function ReviewForm({ spotId }) {
+function ReviewForm({ spotId, onAddReview}) {
   const [reviewText, setReviewText] = useState("");
   const [stars, setStars] = useState(0);
   const [hoverStars, setHoverStars] = useState(0);
   const dispatch = useDispatch();
   const { closeModal } = useModal();
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
-
+  
     const reviewData = { review: reviewText, stars };
-
-    dispatch(sessionActions.addReview(spotId, reviewData))
-      .then(() => {
-        // Clear the form and close the modal on successful submission
-        setReviewText('');
-        setStars(1);
-        closeModal();
-      })
-      .catch((error) => {
-        console.error('Error submitting review:', error);
-      });
+    try {
+      const newReview = await dispatch(addReview(spotId, reviewData));
+      onAddReview(newReview);
+      setReviewText('');
+      setStars(0);
+      closeModal();
+    } catch (error) {
+      console.error("Error submitting review:", error);
+    }
   };
-
   return (
     <div className="review-form-modal">
       <h1>How was your stay?</h1>
@@ -55,7 +52,11 @@ function ReviewForm({ spotId }) {
             </span>
           ))}
         </div>
-        <button type="submit" className="submit-review-button">
+        <button
+          type="submit"
+          className="submit-review-button"
+          disabled={stars === 0 || reviewText.trim() === ""}
+        >
           Submit Your Review
         </button>
       </form>

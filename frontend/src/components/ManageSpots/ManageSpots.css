@@ -98,7 +98,7 @@
   }
   
   .update-button,
-  .delete-button {
+  .custom-delete-button {
     flex: 1;
     padding: 8px;
     background-color: #ff5a5f;
@@ -119,11 +119,11 @@
     background-color: rgb(154, 154, 233);
   }
   
-  .delete-button {
+  .custom-delete-button {
     background-color: #fa8488;
     color: white;
   }
   
-  .delete-button:hover {
+  .custom-delete-button:hover {
     background-color: #e13a3a;
   }

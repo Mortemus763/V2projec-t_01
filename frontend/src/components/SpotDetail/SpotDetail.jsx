@@ -2,59 +2,85 @@ import { useEffect, useState } from 'react';
 import { useParams } from 'react-router-dom';
 import { useSelector } from 'react-redux';
 import ReviewFormModal from '../ReviewFormModal/ReviewFormModal';
+import DeleteReview from "../DeleteReview/DeleteReview";
 import OpenModalButton from '../OpenModalButton/OpenModalButton';
 import './SpotDetail.css'; // Add custom CSS for styling
 
 function SpotDetail() {
   const { spotId } = useParams(); // Get spot ID from URL
   const [spot, setSpot] = useState(null);
+  const [reviews, setReviews] = useState([]); // For spot-specific reviews
   const sessionUser = useSelector((state) => state.session.user);
 
   useEffect(() => {
+    // Fetch spot details
     const fetchSpotDetails = async () => {
-      try {
-        const response = await fetch(`/api/spots/${spotId}`);
-        if (!response.ok) throw new Error('Failed to fetch spot details');
-        const data = await response.json();
-        setSpot(data); // Set the state with the fetched spot details
-      } catch (error) {
-        console.error(error);
-      }
+      const response = await fetch(`/api/spots/${spotId}`);
+      const data = await response.json();
+      setSpot(data);
+    };
+
+    // Fetch reviews for the spot
+    const fetchReviews = async () => {
+      const response = await fetch(`/api/spots/${spotId}/reviews`);
+      const data = await response.json();
+      setReviews(data.Reviews || []); // Default to empty array
     };
 
     fetchSpotDetails();
+    fetchReviews();
   }, [spotId]);
+  const handleAddReview = (newReview) => {
+    setReviews((prevReviews) => [...prevReviews, newReview]);
+  };
+  if (!spot) return <div>Loading...</div>;
 
-  if (!spot) {
-    return <div>Loading...</div>;
-  }
+  // Calculate average rating and review count dynamically
+  const reviewCount = reviews.length;
+  const averageRating =
+    reviewCount > 0
+      ? (reviews.reduce((sum, review) => sum + review.stars, 0) / reviewCount).toFixed(1)
+      : "New";
 
   const handleReserve = () => {
-    alert("Feature coming soon");
+    alert("Feature coming soon!");
   };
-  const spotImages = spot?.SpotImages || [];
-  const reviews = spot?.Reviews || [];
+
   return (
     <div className="spot-detail-page">
       {/* Header Section */}
       <div className="spot-header">
         <h1>{spot.name}</h1>
-        <h2>{spot.city}, {spot.state}, {spot.country}</h2>
+        <h2>
+          {spot.city}, {spot.state}, {spot.country}
+        </h2>
       </div>
 
       {/* Images Section */}
       <div className="spot-images">
-        <img src={spotImages[0]?.url || "/placeholder.jpg"} alt="Main" className="main-image" />
+        <img
+          src={spot.SpotImages?.[0]?.url || "/placeholder.jpg"}
+          alt="Main"
+          className="main-image"
+        />
         <div className="thumbnail-images">
-          {spotImages.slice(1, 5).map((image, index) => (
-            <img key={index} src={image.url} alt={`Spot thumbnail ${index + 1}`} className="thumbnail" />
+          {spot.SpotImages?.slice(1, 5).map((image, index) => (
+            <img
+              key={index}
+              src={image.url}
+              alt={`Thumbnail ${index + 1}`}
+              className="thumbnail"
+            />
           ))}
         </div>
       </div>
+
       <div className="content-container">
         {/* Left Side - Spot Info */}
         <div className="spot-info">
-          <p>Hosted by {spot.Owner.firstName} {spot.Owner.lastName}</p>
+          <p>
+            Hosted by {spot.Owner?.firstName} {spot.Owner?.lastName}
+          </p>
           <p>{spot.description}</p>
         </div>
 
@@ -64,37 +90,39 @@ function SpotDetail() {
             <span className="price">{`$${spot.price}`}</span>
             <span className="per-night">/ night</span>
             <div className="rating">
-              <span>★ {spot.avgStarRating || "New"}</span>
-              {spot.numReviews > 0 && (
-                <span> · {spot.numReviews} Review{spot.numReviews > 1 ? "s" : ""}</span>
+              <span>★ {averageRating}</span>
+              {reviewCount > 0 && (
+                <span>
+                  {" "}
+                  · {reviewCount} Review{reviewCount > 1 ? "s" : ""}
+                </span>
               )}
             </div>
           </div>
-          <button onClick={handleReserve} className="reserve-button">Reserve</button>
+          <button onClick={handleReserve} className="reserve-button">
+            Reserve
+          </button>
         </div>
       </div>
 
       {/* Reviews Section */}
       <div className="reviews-section">
         <h3>
-          ★ {spot.avgStarRating || "New"} · {spot.numReviews} Review{spot.numReviews > 1 ? "s" : ""}
+          ★ {averageRating} · {reviewCount} Review{reviewCount > 1 ? "s" : ""}
         </h3>
 
         {/* Post Your Review Button */}
-        {sessionUser ? (
+        {sessionUser && !reviews.some((review) => review.userId === sessionUser.id) && (
           <div className="post-review-container">
             <OpenModalButton
               buttonText="Post Your Review"
               className="post-review-button"
-              modalComponent={<ReviewFormModal spotId={spotId} />}
+              modalComponent={<ReviewFormModal spotId={spotId} onAddReview={handleAddReview} />}
             />
           </div>
-        ) : (
-          <p style={{ color: 'black' }}>Please log in to post a review.</p>
         )}
-
         {/* List of Reviews */}
-        {spot.Reviews && spot.Reviews.length > 0 ? (
+        {reviews.length > 0 ? (
           <div className="reviews-list">
             {reviews.map((review) => (
               <div key={review.id} className="review-item">
@@ -106,11 +134,29 @@ function SpotDetail() {
                   })}
                 </p>
                 <p>{review.review}</p>
+
+                {/* Delete button only for review owner */}
+                {sessionUser && sessionUser.id === review.userId && (
+                  <OpenModalButton
+                    buttonText="Delete"
+                    className="delete-review-button"
+                    modalComponent={
+                      <DeleteReview
+                        reviewId={review.id}
+                        onReviewDeleted={(deletedReviewId) =>
+                          setReviews((prevReviews) =>
+                            prevReviews.filter((review) => review.id !== deletedReviewId)
+                          )
+                        }
+                      />
+                    }
+                  />
+                )}
               </div>
             ))}
           </div>
         ) : (
-          <p style={{ color: "black" }}>No reviews yet.</p>
+          <p>No reviews yet.</p>
         )}
       </div>
     </div>
