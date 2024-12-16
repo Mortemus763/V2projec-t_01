@@ -73,7 +73,7 @@ function ManageSpots() {
       <h1>Manage Spots</h1>
       {spots.length === 0 ? (
         <div className="no-spots">
-          <p>You have not created any spots yet.</p>
+          <p className="no-spots-message">You have not created any spots yet.</p>
           <button
             onClick={() => navigate("/spots/new")}
             className="create-spot-button"

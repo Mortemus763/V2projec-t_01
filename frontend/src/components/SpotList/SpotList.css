@@ -108,3 +108,15 @@
       grid-template-columns: 1fr;
     }
   }
+  .loading {
+    text-align: center;
+    font-size: 1.5rem;
+    color: #ff5a5f;
+    margin-top: 50px;
+  }
+  .no-spots-message {
+    text-align: center;
+    font-size: 1rem; 
+    color: black; 
+    margin-top: 50px; 
+  }

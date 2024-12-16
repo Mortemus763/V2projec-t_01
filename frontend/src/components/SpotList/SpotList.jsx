@@ -4,6 +4,7 @@ import './SpotList.css'; // Create and import this CSS file
 
 const SpotList = () => {
   const [spots, setSpots] = useState([]);
+  const [loading, setLoading] = useState(true); // Add a loading state
 
   useEffect(() => {
     const fetchSpots = async () => {
@@ -38,11 +39,18 @@ const SpotList = () => {
         setSpots(sortedSpots);
       } catch (error) {
         console.error('Error fetching spots:', error);
+      } finally {
+        setLoading(false); // End loading state once the data is fetched
       }
     };
 
     fetchSpots();
   }, []);
+
+  if (loading) {
+    // Display a loading spinner or message while fetching
+    return <div className="loading">Loading spots...</div>;
+  }
 
   return (
     <div className="spot-list">
@@ -74,7 +82,7 @@ const SpotList = () => {
           </Link>
         ))
       ) : (
-        <p>No spots available</p>
+        <p className='no-spots-message'>No spots available</p>
       )}
     </div>
   );
