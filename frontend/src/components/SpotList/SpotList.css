@@ -111,7 +111,7 @@
   .loading {
     text-align: center;
     font-size: 1.5rem;
-    color: #ff5a5f;
+    color: grey;
     margin-top: 50px;
   }
   .no-spots-message {

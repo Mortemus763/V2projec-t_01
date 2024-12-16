@@ -7,39 +7,52 @@ import "./ManageSpots.css";
 
 function ManageSpots() {
   const [spots, setSpots] = useState([]);
+  const [isLoading, setIsLoading] = useState(true); // Loading state
   const sessionUser = useSelector((state) => state.session.user);
   const navigate = useNavigate();
 
   useEffect(() => {
     const fetchSpots = async () => {
-      const response = await fetch(`/api/spots/current`);
-      const data = await response.json();
+      setIsLoading(true); // Start loading
+      try {
+        const response = await fetch(`/api/spots/current`);
+        const data = await response.json();
 
-      // Fetch reviews for each spot and calculate avgStarRating and numReviews
-      const spotsWithRatings = await Promise.all(
-        data.Spots.map(async (spot) => {
-          const reviewsRes = await fetch(`/api/spots/${spot.id}/reviews`);
-          const reviewsData = await reviewsRes.json();
+        const spotsWithRatings = await Promise.all(
+          data.Spots.map(async (spot) => {
+            const reviewsRes = await fetch(`/api/spots/${spot.id}/reviews`);
+            const reviewsData = await reviewsRes.json();
 
-          const reviews = reviewsData.Reviews || [];
-          const reviewCount = reviews.length;
-          const averageRating =
-            reviewCount > 0
-              ? (reviews.reduce((sum, review) => sum + review.stars, 0) / reviewCount).toFixed(1)
-              : "New";
+            const reviews = reviewsData.Reviews || [];
+            const reviewCount = reviews.length;
+            const averageRating =
+              reviewCount > 0
+                ? (
+                    reviews.reduce((sum, review) => sum + review.stars, 0) /
+                    reviewCount
+                  ).toFixed(1)
+                : "New";
 
-          return {
-            ...spot,
-            avgStarRating: averageRating,
-            numReviews: reviewCount,
-          };
-        })
-      );
-      const sortedSpots = spotsWithRatings.sort((a, b) =>
-        new Date(b.updatedAt || b.createdAt) -
-        new Date(a.updatedAt || a.createdAt)
-      );
-      setSpots(sortedSpots);
+            return {
+              ...spot,
+              avgStarRating: averageRating,
+              numReviews: reviewCount,
+            };
+          })
+        );
+
+        const sortedSpots = spotsWithRatings.sort(
+          (a, b) =>
+            new Date(b.updatedAt || b.createdAt) -
+            new Date(a.updatedAt || a.createdAt)
+        );
+
+        setSpots(sortedSpots);
+      } catch (error) {
+        console.error("Error fetching spots:", error);
+      } finally {
+        setIsLoading(false); // End loading
+      }
     };
 
     if (sessionUser) fetchSpots();
@@ -68,10 +81,14 @@ function ManageSpots() {
 
   if (!sessionUser) return <p>Please log in to manage your spots.</p>;
 
-   return (
+  return (
     <div className="manage-spots-page">
       <h1>Manage Spots</h1>
-      {spots.length === 0 ? (
+      {isLoading ? ( // Show loading state
+        <div className="loading-message">
+          <p>Loading spots...</p>
+        </div>
+      ) : spots.length === 0 ? (
         <div className="no-spots">
           <p className="no-spots-message">You have not created any spots yet.</p>
           <button
@@ -87,15 +104,14 @@ function ManageSpots() {
             <div
               key={spot.id}
               className="spot-tile"
-              onClick={() => handleTileClick(spot.id)} // Navigate to SpotDetail
+              onClick={() => handleTileClick(spot.id)}
             >
-               <img
-              src={spot.previewImage || '/default-image.png'}
-              alt={spot.name}
-              className="spot-image"
-            />
+              <img
+                src={spot.previewImage || "/default-image.png"}
+                alt={spot.name}
+                className="spot-image"
+              />
               <div className="spot-info">
-                {/* Spot header: name and rating */}
                 <div className="spot-header">
                   <h2 className="spot-name" title={spot.name}>
                     {spot.name}
@@ -104,18 +120,18 @@ function ManageSpots() {
                     <span className="star-icon">★</span>
                     {spot.avgStarRating}{" "}
                     {spot.numReviews > 0
-                      ? `· ${spot.numReviews} Review${spot.numReviews > 1 ? "s" : ""}`
+                      ? `· ${spot.numReviews} Review${
+                          spot.numReviews > 1 ? "s" : ""
+                        }`
                       : ""}
                   </div>
                 </div>
 
-                {/* Location and price */}
                 <p className="spot-location">
                   {spot.city}, {spot.state}
                 </p>
                 <p className="spot-price">${spot.price} / night</p>
 
-                {/* Update and Delete buttons */}
                 <div className="spot-buttons">
                   <button
                     onClick={(e) => {
@@ -135,7 +151,7 @@ function ManageSpots() {
                         onDelete={() => handleDelete(spot.id)}
                       />
                     }
-                    onButtonClick={(e) => e.stopPropagation()} // Prevent tile click
+                    onButtonClick={(e) => e.stopPropagation()}
                   />
                 </div>
               </div>
