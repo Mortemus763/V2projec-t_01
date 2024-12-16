@@ -26,25 +26,25 @@ const validateSpot = [
         .notEmpty()
         .withMessage('Please provide country'),
     check('lat')
-        .exists({ checkFalsy: true })
-        .notEmpty()
-        .withMessage('Please provide lat'),
+        .optional({ nullable: true })
+        .isFloat({ min: -90, max: 90 })
+        .withMessage('Latitude must be between -90 and 90'),
     check('lng')
-        .exists({ checkFalsy: true })
-        .notEmpty()
-        .withMessage('Please provide lng'),
+        .optional({ nullable: true })
+        .isFloat({ min: -180, max: 180 })
+        .withMessage('Longitude must be between -180 and 180'),
     check('name')
         .exists({ checkFalsy: true })
         .notEmpty()
         .withMessage('Please provide name'),
     check('description')
         .exists({ checkFalsy: true })
-        .notEmpty()
-        .withMessage('Please provide description'),
+        .isLength({ min: 30 })
+        .withMessage('Description needs 30 or more characters'),
     check('price')
         .exists({ checkFalsy: true })
-        .notEmpty()
-        .withMessage('Please provide price'),
+        .isFloat({ min: 0 })
+        .withMessage('Price must be a positive number'),
     handleValidationErrors
 ]
 
@@ -98,11 +98,9 @@ router.post('/:spotId/bookings', requireAuth, requireNotOwnerAuthorization, asyn
     const { spotId } = req.params;
     const userId = req.user.id;
     const { startDate, endDate } = req.body;
-
-    const t = await sequelize.transaction();
-
     try {
         const spot = await Spot.findByPk(spotId);
+        await user.addSpot(spot, { transaction: t });
         if (!spot) {
             return res.status(404).json({ message: "Spot couldn't be found" });
         }
@@ -226,7 +224,19 @@ router.post('/',
         }
     });
 //New image for spot based on Spot's id
-router.post('/:spotId/images', requireAuth, requireAuthorization, async (req, res, next) => {
+const validateImage = (req, res, next) => {
+    const { url, preview } = req.body;
+    const errors = {};
+  
+    if (!url || !url.trim()) errors.url = 'Image URL is required';
+    if (typeof preview !== 'boolean') errors.preview = 'Preview must be a boolean';
+  
+    if (Object.keys(errors).length > 0) {
+      return res.status(400).json({ errors });
+    }
+    next();
+  };
+router.post('/:spotId/images', requireAuth, requireAuthorization, validateImage, async (req, res, next) => {
     const { spotId } = req.params;
     const { url, preview } = req.body;
     try {

@@ -24,32 +24,9 @@
   padding: 10px;
 }
 
-.button .submit-review-button {
-  background: #ff5a5f;
-  color: white;
-  padding: 10px 15px;
-  border: none;
-  border-radius: 5px;
-  cursor: pointer;
-  transition: background-color 0.3s ease;
-}
-
-/* Hover state for enabled button */
-.submit-review-button:hover {
-  background-color: #e13a3a;
-}
-
-/* Disabled state: Higher specificity */
-.submit-review-button:disabled,
-.submit-review-button.disabled {
-  background-color: #ccc !important; /* Grayed out for disabled state */
-  color: #666 !important;
-  cursor: not-allowed !important;
-}
-
 /* Prevent hover effects on disabled buttons */
-.submit-review-button:disabled:hover,
-.submit-review-button.disabled:hover {
+.review-form-modal .submit-review-button:disabled:hover,
+.review-form-modal .submit-review-button.disabled:hover {
   background-color: #ccc !important;
 }
 .error-text {

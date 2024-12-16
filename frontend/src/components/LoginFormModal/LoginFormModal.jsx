@@ -17,6 +17,7 @@ function LoginFormModal() {
     dispatch(sessionActions.login({ credential, password }))
     .then(() => {
       closeModal(); 
+      window.location.reload(); 
     })
     .catch(async (res) => {
       const data = await res.json();
@@ -29,11 +30,14 @@ function LoginFormModal() {
   };
   const handleDemoLogin = () => {
     dispatch(sessionActions.demoLogin()) // Dispatch the demo login action
-    .then(closeModal)  // Close the modal after successful login
-    .catch((error) => {
-      setErrors({ credential: "Demo login failed. Please try again." });
-      console.error('Demo login error:', error);  // Log any errors in the frontend
-    });
+      .then(() => {
+        closeModal(); // Close the modal after successful login
+        window.location.reload(); // Reload the page to reflect the user state
+      })
+      .catch((error) => {
+        setErrors({ credential: "Demo login failed. Please try again." });
+        console.error('Demo login error:', error);
+      });
   };
   const isDisabled = credential.length < 4 || password.length < 6;
   return (

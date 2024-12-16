@@ -35,8 +35,11 @@ function ManageSpots() {
           };
         })
       );
-
-      setSpots(spotsWithRatings);
+      const sortedSpots = spotsWithRatings.sort((a, b) =>
+        new Date(b.updatedAt || b.createdAt) -
+        new Date(a.updatedAt || a.createdAt)
+      );
+      setSpots(sortedSpots);
     };
 
     if (sessionUser) fetchSpots();
@@ -45,7 +48,19 @@ function ManageSpots() {
   const handleUpdate = (spotId) => {
     navigate(`/spots/${spotId}/edit`);
   };
+  const handleDelete = async (spotId) => {
+    try {
+      const response = await fetch(`/api/spots/${spotId}`, { method: "DELETE" });
 
+      if (response.ok) {
+        setSpots((prevSpots) => prevSpots.filter((spot) => spot.id !== spotId));
+      } else {
+        console.error("Failed to delete spot");
+      }
+    } catch (error) {
+      console.error("Error deleting spot:", error);
+    }
+  };
   const handleTileClick = (spotId) => {
     // Navigate to SpotDetail page when a tile is clicked
     navigate(`/spots/${spotId}`);
@@ -117,11 +132,7 @@ function ManageSpots() {
                     modalComponent={
                       <DeleteSpotModal
                         spotId={spot.id}
-                        onDelete={() =>
-                          setSpots((prevSpots) =>
-                            prevSpots.filter((s) => s.id !== spot.id)
-                          )
-                        }
+                        onDelete={() => handleDelete(spot.id)}
                       />
                     }
                     onButtonClick={(e) => e.stopPropagation()} // Prevent tile click

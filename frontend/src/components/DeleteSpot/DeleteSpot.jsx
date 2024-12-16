@@ -2,6 +2,7 @@ import { useDispatch } from 'react-redux';
 import { deleteSpot } from '../../store/spot'; // Ensure you have this action in your Redux store
 import { useModal } from '../../context/Modal';
 import './DeleteSpot.css'
+
 function DeleteSpot({ spotId }) {
   const dispatch = useDispatch();
   const { closeModal } = useModal();
@@ -10,6 +11,7 @@ function DeleteSpot({ spotId }) {
     try {
       await dispatch(deleteSpot(spotId)); // Dispatch the delete action
       closeModal(); // Close the modal after successful deletion
+      window.location.reload();
     } catch (err) {
       console.error('Failed to delete the spot:', err);
     }

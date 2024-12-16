@@ -2,9 +2,11 @@
     max-width: 1200px;
     margin: 0 auto;
     padding: 20px;
+    grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
   }
   .manage-spot-tile {
     display: flex;
+    gap: 20px;
     flex-direction: column;
     background-color: white;
     border: 1px solid #ddd;
@@ -38,19 +40,10 @@
   .create-spot-button:hover {
     background-color: #e13a3a;
   }
-  
-  .spots-grid {
-    display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
-    gap: 20px;
-    padding: 20px;
-    margin: 0 auto;
-    max-width: 1200px;
-  }
-  
+
   .spot-tile {
     display: flex;
-    width: 400px;
+    width: 385px;
     flex-direction: column;
     background-color: white;
     border: 1px solid #ddd;

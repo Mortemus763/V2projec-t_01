@@ -93,6 +93,7 @@
 
 .reserve-box {
   padding: 20px;
+  width: 250px;
   border: 1px solid #ddd;
   border-radius: 8px;
   background-color: #f9f9f9;
@@ -185,7 +186,7 @@ select {
   margin-bottom: 10px;
 }
 
-button[type="submit"] {
+.spot-detail-page .button {
   background-color: #FF5A5F;
   color: white;
   border: none;
@@ -195,12 +196,13 @@ button[type="submit"] {
   cursor: pointer;
 }
 
-button[type="submit"]:hover {
-  background-color: #D15D5D;
+.spot-detail-page .button:hover {
+  background-color: #ccc ; /* Grayed out for disabled state */
+  color: #666 ;
 }
-button:disabled {
-  background-color: #ccc !important; /* Grayed out for disabled state */
-  color: #666 !important;
+.spot-detail-page .button:disabled {
+  background-color: #ccc ; /* Grayed out for disabled state */
+  color: #666 ;
 }
 
 .post-review-container {
@@ -235,4 +237,9 @@ button:disabled {
 .post-review-button:hover {
   background-color: #333; /* Slightly darker grey */
   box-shadow: 0 4px 8px rgba(0, 0, 0, 0.7); /* Enhance shadow on hover */
+}
+.no-reviews-text {
+  font-size: 1rem; /* Adjust the size as needed */
+  font-weight: bold; /* Optional: make it bold */
+  color: #444; /* Optional: change color */
 }

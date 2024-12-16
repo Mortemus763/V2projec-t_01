@@ -19,9 +19,12 @@ function CreateSpot() {
   const [previewImage, setPreviewImage] = useState('');
   const [images, setImages] = useState(['', '', '', '']);
   const [errors, setErrors] = useState({});
+  const [isSubmitting, setIsSubmitting] = useState(false);
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+
+    setIsSubmitting(false); // Set the submission state
     setErrors({});
 
     const formErrors = {};
@@ -35,12 +38,24 @@ function CreateSpot() {
     if (!name) formErrors.name = 'Name is required';
     if (!price) formErrors.price = 'Price per night is required';
     if (!previewImage) formErrors.previewImage = 'Preview Image URL is required';
+    const isValidImageUrl = (url) => /^https?:\/\/.*\.(jpg|jpeg|png|gif)(\?.*)?$/i.test(url);
 
+    if (!isValidImageUrl(previewImage)) {
+      formErrors.previewImage =
+        'Preview Image URL must be a valid image link (jpg, jpeg, png, gif)';
+    }
+
+    // Validate additional images
+    images.forEach((image, index) => {
+      if (image && !isValidImageUrl(image)) {
+        formErrors[`image${index + 1}`] = `Image ${index + 1} URL must be valid`;
+      }
+    });
     if (Object.keys(formErrors).length > 0) {
       setErrors(formErrors);
       return;
     }
-
+    setIsSubmitting(true);
     const newSpot = {
       country,
       address,
@@ -57,9 +72,11 @@ function CreateSpot() {
 
     try {
       const createdSpot = await dispatch(createSpot(newSpot, imageUrls));
-      navigate.push(`/spots/${createdSpot.id}`);
+      navigate(`/spots/${createdSpot.id}`);
     } catch (err) {
       console.error('Error creating spot:', err);
+    } finally {
+      setIsSubmitting(false);
     }
   };
   return (
@@ -155,12 +172,16 @@ function CreateSpot() {
                 }}
                 placeholder="Image URL"
               />
+              {errors[`image${index + 1}`] && <p className="error-text">{errors[`image${index + 1}`]}</p>}
             </label>
           ))}
         </div>
 
-        <button type="submit" className="create-spot-button">
-          Create Spot
+        <button
+          type="submit"
+          className="create-spot-button"
+          disabled={isSubmitting}>
+          {isSubmitting ? "Creating Spot..." : "Create Spot"}
         </button>
       </form>
     </div>

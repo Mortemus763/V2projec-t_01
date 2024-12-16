@@ -62,7 +62,8 @@ function SignupFormModal() {
         })
       );
       if (newUser) {
-        closeModal(); // Automatically closes the modal upon success
+        closeModal();
+        window.location.reload(); 
       }
     } catch (res) {
       const data = await res.json();

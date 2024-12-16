@@ -31,8 +31,11 @@ const SpotList = () => {
             };
           })
         );
-        
-        setSpots(spotsWithRatings);
+        const sortedSpots = spotsWithRatings.sort((a, b) =>
+          new Date(b.updatedAt || b.createdAt) -
+          new Date(a.updatedAt || a.createdAt)
+        );
+        setSpots(sortedSpots);
       } catch (error) {
         console.error('Error fetching spots:', error);
       }

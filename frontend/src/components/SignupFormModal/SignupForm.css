@@ -23,12 +23,12 @@ body {
   }
   
   /* Input Styles */
-  label {
+  /* label {
     display: block;
     margin-bottom: 8px;
     font-weight: bold;
     color: #555555;
-  }
+  } */
   
   input {
     width: 100%;
@@ -49,7 +49,7 @@ body {
     background-color: #FF5A5F; /* Airbnb's primary red color */
     color: white; /* White text */
     padding: 10px 20px; /* Add padding */
-    font-size: 16px; /* Adjust font size */
+    font-size: 15px; /* Adjust font size */
     border: none; /* Remove borders */
     border-radius: 8px; /* Rounded corners */
     cursor: pointer; /* Pointer cursor on hover */
@@ -62,6 +62,12 @@ body {
   .signup-button:hover {
     background-color: #E13A3A; /* Slightly darker red on hover */
     opacity: 0.9; /* Slight fade effect */
+  }
+  .signup-button:disabled {
+    background-color: #f56f6f;
+    opacity: 0.6;
+    border-color: #ddd;
+    color: white;
   }
   /* Error Messages */
   p {
@@ -76,5 +82,18 @@ body {
   
     button {
       font-size: 14px;
+      background: #ff5a5f;
+   color: white;
+  padding: 10px 15px;
+  border: none;
+  border-radius: 5px;
+  cursor: pointer;
+  transition: background-color 0.3s ease;
     }
-  
+    button:hover{
+      background-color: #e13a3a;
+}
+  button:disabled {
+    background-color: #ccc;
+    color: #666 
+  }

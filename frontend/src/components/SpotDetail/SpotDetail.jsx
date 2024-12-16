@@ -114,7 +114,7 @@ function SpotDetail() {
         </h3>
 
         {/* Post Your Review Button */}
-        {sessionUser && !reviews.some((review) => review.userId === sessionUser.id) && (
+        {sessionUser &&  sessionUser.id !== spot.ownerId && !reviews.some((review) => review.userId === sessionUser.id) && (
           <div className="post-review-container">
             <OpenModalButton
               buttonText="Post Your Review"
@@ -158,7 +158,7 @@ function SpotDetail() {
             ))}
           </div>
         ) : (
-          <p>No reviews yet.</p>
+          <p className="no-reviews-text">No reviews yet.</p>
         )}
       </div>
     </div>

@@ -39,17 +39,48 @@ export const clearErrorsAction = () => ({
 });
 
 // Thunks
-export const createSpot = (spotData) => async (dispatch) => {
-  const res = await csrfFetch('/api/spots', {
-    method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify(spotData),
-  });
+export const createSpot = (spotData, imageUrls) => async (dispatch) => {
+  try {
+    // Step 1: Create the spot
+    const res = await csrfFetch('/api/spots', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(spotData),
+    });
 
-  if (res.ok) {
-    const spot = await res.json();
-    dispatch(createSpotAction(spot));
-    return spot;
+    if (res.ok) {
+      const spot = await res.json();
+
+      // Step 2: Add images for the spot
+      const imagePromises = imageUrls.map(async (url, index) => {
+        const res = await csrfFetch(`/api/spots/${spot.id}/images`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            url,
+            preview: index === 0, // Mark the first image as the preview
+          }),
+        });
+
+        if (!res.ok) {
+          const errors = await res.json();
+          throw errors;
+        }
+        return res.json();
+      });
+
+      await Promise.all(imagePromises);
+
+      // Dispatch and return the new spot
+      dispatch(createSpotAction(spot));
+      return spot;
+    } else {
+      const errors = await res.json();
+      throw errors;
+    }
+  } catch (err) {
+    console.error('Error creating spot:', err);
+    throw err;
   }
 };
 
@@ -70,29 +101,47 @@ export const getAllSpots = () => async (dispatch) => {
 };
 
 export const updateSpot = (spotId, updatedSpot) => async (dispatch) => {
-  const res = await csrfFetch(`/api/spots/${spotId}`, {
-    method: 'PUT',
-    headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify(updatedSpot),
-  });
+  try {
+    const res = await csrfFetch(`/api/spots/${spotId}`, {
+      method: 'PUT',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(updatedSpot),
+    });
 
-  if (res.ok) {
-    const spot = await res.json();
-    dispatch(updateSpotAction(spot));
-    return spot;
+    if (res.ok) {
+      const spot = await res.json();
+      dispatch(updateSpotAction(spot));
+
+      // Fetch updated spot list if necessary
+      const allSpotsRes = await csrfFetch('/api/spots');
+      const allSpots = await allSpotsRes.json();
+
+      dispatch(getAllSpotsAction(allSpots.Spots));
+      return spot;
+    } else {
+      const errors = await res.json();
+      throw errors;
+    }
+  } catch (err) {
+    console.error('Failed to update spot:', err);
+    throw err;
   }
 };
 
 export const deleteSpot = (spotId) => async (dispatch) => {
-  const res = await csrfFetch(`/api/spots/${spotId}`, {
-    method: 'DELETE',
-  });
+  try {
+    const res = await csrfFetch(`/api/spots/${spotId}`, {
+      method: 'DELETE',
+    });
 
-  if (res.ok) {
-    dispatch(deleteSpotAction(spotId));
+    if (res.ok) {
+      dispatch(deleteSpotAction(spotId)); // Update the Redux store directly
+    }
+  } catch (err) {
+    console.error('Failed to delete spot:', err);
+    throw err;
   }
 };
-
 // Initial State
 const initialState = {
   spot: null,
@@ -137,11 +186,10 @@ const spotReducer = (state = initialState, action) => {
     }
     case DELETE_SPOT: {
       const newSpots = { ...state.spots };
-      delete newSpots[action.payload];
+      delete newSpots[action.payload]; 
       return {
         ...state,
-        spots: newSpots,
-        spot: state.spot && state.spot.id === action.payload ? null : state.spot,
+        spots: newSpots, 
       };
     }
     case CLEAR_ERRORS: {
