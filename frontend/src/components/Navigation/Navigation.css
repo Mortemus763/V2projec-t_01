@@ -149,9 +149,7 @@ background-color: rgb(243, 63, 63);
   text-align: center;
   min-height: 160px; /* Set a maximum height */
 }
-.profile-dropdown:hover{
-  background-color: whitesmoke;
-}
+
 .profile-dropdown.visible {
   display: block;
 }
@@ -172,10 +170,6 @@ background-color: rgb(243, 63, 63);
   display: inline-block;
   padding: 10px;
   text-decoration: none;
-}
-
-.manage-spots-link:hover {
-  background-color: whitesmoke;
 }
 
 .logout-button {

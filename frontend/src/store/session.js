@@ -27,7 +27,7 @@ export const login = (user) => async (dispatch) => {
   });
   const data = await response.json();
   dispatch(setUser(data.user));
-  return response;
+  return data.user;
 };
 
 const initialState = { user: null };
@@ -83,7 +83,7 @@ export const demoLogin = () => async (dispatch) => {
   if (res.ok) {
     const data = await res.json();
     dispatch(setUser(data.user)); // Dispatch the user data to set the session
-    return res;
+    return data.user;
   }
 
   const errorData = await res.json();

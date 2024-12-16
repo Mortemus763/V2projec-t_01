@@ -3,13 +3,13 @@ import { deleteReview } from "../../store/reviews"; // Import your delete thunk
 import { useModal } from "../../context/Modal";
 import "./DeleteReview.css";
 
-const DeleteReview = ({ reviewId, onReviewDeleted }) => {
+const DeleteReview = ({ spotId, reviewId, onReviewDeleted }) => {
   const dispatch = useDispatch();
   const { closeModal } = useModal();
 
   const handleDelete = async () => {
     try {
-      await dispatch(deleteReview(reviewId)); // Dispatch the delete action
+      await dispatch(deleteReview(spotId, reviewId)); // Dispatch the delete action
       onReviewDeleted(reviewId); // Call the callback to update parent state
       closeModal(); // Close the modal
     } catch (error) {

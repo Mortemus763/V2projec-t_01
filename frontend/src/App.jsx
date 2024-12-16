@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
-import { useDispatch } from 'react-redux';
-import { createBrowserRouter, RouterProvider, Outlet } from 'react-router-dom';
+import { useDispatch, useSelector } from 'react-redux';
+import { createBrowserRouter, RouterProvider, Outlet, Navigate } from 'react-router-dom';
 import Navigation from './components/Navigation/Navigation';
 import SpotList from './components/SpotList/SpotList';
 import SpotDetail from './components/SpotDetail/SpotDetail';
@@ -14,10 +14,14 @@ function Layout() {
   const [isLoaded, setIsLoaded] = useState(false);
 
   useEffect(() => {
-    dispatch(sessionActions.restoreUser()).then(() => {
-      setIsLoaded(true)
-    });
+    dispatch(sessionActions.restoreUser())
+      .then(() => setIsLoaded(true))
+      .catch(() => setIsLoaded(true)); // Handle errors gracefully
   }, [dispatch]);
+
+  if (!isLoaded) {
+    return <div>Loading...</div>; // Replace with a loading spinner or component
+  }
 
   return (
     <>
@@ -25,6 +29,15 @@ function Layout() {
       {isLoaded && <Outlet />}
     </>
   );
+}
+function ProtectedRoute({ children }) {
+  const user = useSelector((state) => state.session.user);
+
+  if (!user) {
+    return <Navigate to="/" replace />; // Redirect to homepage if not logged in
+  }
+
+  return children;
 }
 const router = createBrowserRouter([
   {
@@ -35,20 +48,36 @@ const router = createBrowserRouter([
         element: <SpotList />, 
       },
       {
-        path: '/spots/:spotId',  
-        element: <SpotDetail />,  
+        path: "/spots/:spotId",
+        element: <SpotDetail />,
       },
       {
-        path: '/spots/new',  // Add this route
-        element: <CreateSpot />,  // Component for creating a new spot
+        path: "/spots/new",
+        element: (
+          <ProtectedRoute>
+            <CreateSpot />
+          </ProtectedRoute>
+        ),
       },
       {
-        path: '/manage-spots', // Manage spots route
-        element: <ManageSpots />, // Component for managing user's spots
+        path: "/manage-spots",
+        element: (
+          <ProtectedRoute>
+            <ManageSpots />
+          </ProtectedRoute>
+        ),
       },
       {
-        path: '/spots/:spotId/edit',
-        element: <UpdateSpot />, // A new component for updating spots
+        path: "/spots/:spotId/edit",
+        element: (
+          <ProtectedRoute>
+            <UpdateSpot />
+          </ProtectedRoute>
+        ),
+      },
+      {
+        path: "*",
+        element: <div>Page Not Found</div>, // Fallback for undefined routes
       },
     ]
   }

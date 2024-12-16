@@ -1,8 +1,24 @@
 .spot-detail-page {
-  max-width: 1000px;
-  margin: 20px auto;
-  padding: 20px;
+  max-width: 1200px; /* Full width */
+  margin: auto;
+  /* padding: 20px 50px; Top and bottom padding, smaller left and right padding */
   font-family: Arial, sans-serif;
+  /* box-sizing: border-box; */
+}
+@media (max-width: 768px) {
+  .spot-images {
+    flex-direction: column; /* Stack images vertically */
+  }
+
+  .thumbnail-grid {
+    grid-template-columns: 1fr; /* Single column for thumbnails */
+  }
+}
+@media (min-width: 1200px) {
+  .spot-detail-page {
+    max-width: 1200px; /* For larger screens, set a max width */
+    /* padding: 20px; Adjust padding for large screens */
+  }
 }
 .spot-detail-page .spot-header {
   display: flex;
@@ -24,25 +40,32 @@
 
 /* Images Section */
 .spot-images {
-  display: flex;
-  flex-direction: column;
-  gap: 10px;
+  display: flex; /* Horizontal alignment */
+  gap: 10px; /* Space between main image and thumbnails */
+  align-items: flex-start; /* Align items at the top */
+}
+
+.main-image-container {
+  flex: 1; /* Takes up 50% of the container */
 }
 
 .main-image {
   width: 100%;
-  height: auto;
+  height: 405px;
   border-radius: 8px;
+  object-fit: cover;
 }
 
-.thumbnail-images {
-  display: flex;
-  gap: 10px;
+.thumbnail-grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr); /* 2x2 grid */
+  grid-gap: 10px; /* Space between thumbnails */
+  flex: 1; /* Takes up the remaining 50% */
 }
 
 .thumbnail {
-  width: 100px;
-  height: 100px;
+  width: 100%;
+  height: 195px; /* Fixed height for thumbnails */
   border-radius: 8px;
   object-fit: cover;
   border: 1px solid #ddd;
@@ -175,6 +198,10 @@ button[type="submit"] {
 button[type="submit"]:hover {
   background-color: #D15D5D;
 }
+button:disabled {
+  background-color: #ccc !important; /* Grayed out for disabled state */
+  color: #666 !important;
+}
 
 .post-review-container {
   margin-bottom: 20px; /* Add spacing below the button */
@@ -192,4 +219,20 @@ button[type="submit"]:hover {
 
 .delete-review-button:hover {
   background-color: #e04145;
+}
+.post-review-button {
+  background-color: #444; /* Dark grey background */
+  color: white; /* White text color */
+  border: none; /* Remove borders */
+  padding: 10px 20px; /* Vertical and horizontal padding */
+  font-size: 1rem; /* Standard font size */
+  cursor: pointer; /* Pointer cursor on hover */
+  border-radius: 5px; /* Slightly rounded corners */
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.5); /* Add subtle shadow */
+  transition: background-color 0.3s ease, box-shadow 0.3s ease; /* Smooth transition */
+  text-align: center; /* Center the text */
+}
+.post-review-button:hover {
+  background-color: #333; /* Slightly darker grey */
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.7); /* Enhance shadow on hover */
 }

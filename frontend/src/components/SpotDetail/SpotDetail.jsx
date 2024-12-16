@@ -58,12 +58,14 @@ function SpotDetail() {
 
       {/* Images Section */}
       <div className="spot-images">
-        <img
-          src={spot.SpotImages?.[0]?.url || "/placeholder.jpg"}
-          alt="Main"
-          className="main-image"
-        />
-        <div className="thumbnail-images">
+        <div className="main-image-container">
+          <img
+            src={spot.SpotImages?.[0]?.url || "/placeholder.jpg"}
+            alt="Main"
+            className="main-image"
+          />
+        </div>
+        <div className="thumbnail-grid">
           {spot.SpotImages?.slice(1, 5).map((image, index) => (
             <img
               key={index}

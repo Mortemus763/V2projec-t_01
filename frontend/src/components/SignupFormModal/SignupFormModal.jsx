@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useDispatch } from 'react-redux';
 import { useModal } from '../../context/Modal';
 import * as sessionActions from '../../store/session';
@@ -13,34 +13,64 @@ function SignupFormModal() {
   const [password, setPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
   const [errors, setErrors] = useState({});
+  const [isSubmitDisabled, setIsSubmitDisabled] = useState(true);
   const { closeModal } = useModal();
+  
+  useEffect(() => {
+    const isFormValid =
+      email.trim() &&
+      username.length >= 4 &&
+      firstName.trim() &&
+      lastName.trim() &&
+      password.length >= 6 &&
+      confirmPassword === password;
 
-  const handleSubmit = (e) => {
-    e.preventDefault();
-    if (password === confirmPassword) {
+    setIsSubmitDisabled(!isFormValid);
+  }, [email, username, firstName, lastName, password, confirmPassword]);
+
+  // Reset errors and fields when the modal is reopened
+  useEffect(() => {
+    return () => {
+      setEmail("");
+      setUsername("");
+      setFirstName("");
+      setLastName("");
+      setPassword("");
+      setConfirmPassword("");
       setErrors({});
-      return dispatch(
+    };
+  }, []);
+
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+  
+    if (password !== confirmPassword) {
+      setErrors({
+        confirmPassword: "Confirm Password field must match the Password field",
+      });
+      return;
+    }
+  
+    try {
+      const newUser = await dispatch(
         sessionActions.signup({
           email,
           username,
           firstName,
           lastName,
-          password
+          password,
         })
-      )
-        .then(closeModal)
-        .catch(async (res) => {
-          const data = await res.json();
-          if (data?.errors) {
-            setErrors(data.errors);
-          }
-        });
+      );
+      if (newUser) {
+        closeModal(); // Automatically closes the modal upon success
+      }
+    } catch (res) {
+      const data = await res.json();
+      if (data?.errors) {
+        setErrors(data.errors);
+      }
     }
-    return setErrors({
-      confirmPassword: "Confirm Password field must be the same as the Password field"
-    });
   };
-
   return (
     <>
       <h1>Sign Up</h1>
@@ -107,7 +137,13 @@ function SignupFormModal() {
         {errors.confirmPassword && (
           <p>{errors.confirmPassword}</p>
         )}
-        <button type="submit" className="signup-button">Sign Up</button>
+         <button
+          type="submit"
+          className={`signup-button ${isSubmitDisabled ? "disabled" : ""}`}
+          disabled={isSubmitDisabled}
+        >
+          Sign Up
+        </button>
       </form>
     </>
   );

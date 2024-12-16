@@ -1,7 +1,10 @@
 .review-form-modal {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
   text-align: center;
+  padding: 20px;
 }
-
 .review-form-modal h2 {
   font-size: 1.5rem;
   margin-bottom: 20px;
@@ -21,19 +24,34 @@
   padding: 10px;
 }
 
-.submit-review-button {
+.button .submit-review-button {
   background: #ff5a5f;
   color: white;
   padding: 10px 15px;
   border: none;
   border-radius: 5px;
   cursor: pointer;
+  transition: background-color 0.3s ease;
 }
 
+/* Hover state for enabled button */
 .submit-review-button:hover {
-  background: #e13a3a;
+  background-color: #e13a3a;
 }
 
+/* Disabled state: Higher specificity */
+.submit-review-button:disabled,
+.submit-review-button.disabled {
+  background-color: #ccc !important; /* Grayed out for disabled state */
+  color: #666 !important;
+  cursor: not-allowed !important;
+}
+
+/* Prevent hover effects on disabled buttons */
+.submit-review-button:disabled:hover,
+.submit-review-button.disabled:hover {
+  background-color: #ccc !important;
+}
 .error-text {
   color: red;
   font-size: 0.9rem;

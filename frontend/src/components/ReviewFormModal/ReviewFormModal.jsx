@@ -25,6 +25,7 @@ function ReviewForm({ spotId, onAddReview}) {
       console.error("Error submitting review:", error);
     }
   };
+  const isSubmitDisabled = reviewText.trim().length < 10 || stars === 0;
   return (
     <div className="review-form-modal">
       <h1>How was your stay?</h1>
@@ -54,8 +55,8 @@ function ReviewForm({ spotId, onAddReview}) {
         </div>
         <button
           type="submit"
-          className="submit-review-button"
-          disabled={stars === 0 || reviewText.trim() === ""}
+          className={`submit-review-button ${isSubmitDisabled ? "disabled" : ""}`}
+          disabled={isSubmitDisabled}
         >
           Submit Your Review
         </button>

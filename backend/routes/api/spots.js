@@ -398,42 +398,52 @@ router.delete('/:spotId',
             next(error);
         }
     });
-router.get('/current',
-    requireAuth,
-    async (req, res, next) => {
-        try {
-            const { id } = req.user
-            const spots = await Spot.findAll({
-                where: { ownerId: id },
-                include: [
-                    {
-                        model: Review,
-                        attributes: []
+    router.get('/current',
+        requireAuth,
+        async (req, res, next) => {
+            try {
+                const { id } = req.user;
+    
+                const spots = await Spot.findAll({
+                    where: { ownerId: id },
+                    attributes: {
+                        include: [
+                            // Average rating calculation
+                            [Sequelize.fn('COALESCE', Sequelize.fn('AVG', Sequelize.col('Reviews.stars')), 0), 'avgRating']
+                        ]
                     },
-                    {
-                        model: SpotImage,
-                        attributes: []
-                    }
-                ],
-                attributes: {
                     include: [
-                        [Sequelize.fn('avg', Sequelize.col('Reviews.stars')), 'avgRating'],
-                        [Sequelize.col('SpotImages.preview'), 'previewImage']
-                    ]
-                },
-                group: ['Spot.id','SpotImages.preview'],
-            });
-
-            return res.json({ Spots: spots })
-
-        } catch (error) {
-            const err = new Error("Failed to get data");
-            err.title = "Failed to get data"
-            err.status = 500
-            err.errors = { message: error.message }
-            next(err)
+                        {
+                            model: Review,
+                            attributes: [], // No need to include actual reviews
+                        },
+                        {
+                            model: SpotImage,
+                            attributes: ['url'], // Only fetch the URL
+                            where: { preview: true }, // Filter for preview image
+                            required: false // Include even if there's no preview image
+                        }
+                    ],
+                    group: ['Spot.id', 'SpotImages.id'] // Group by Spot and SpotImage IDs
+                });
+    
+                // Map spots to include a "previewImage" property for clean response
+                const spotList = spots.map(spot => ({
+                    ...spot.toJSON(),
+                    previewImage: spot.SpotImages[0]?.url || null // Safely access the preview image URL
+                }));
+    
+                return res.json({ Spots: spotList });
+    
+            } catch (error) {
+                const err = new Error("Failed to get data");
+                err.title = "Failed to get data";
+                err.status = 500;
+                err.errors = { message: error.message };
+                next(err);
+            }
         }
-    });
+    );
 
 router.get('/:spotId', async (req, res) => {
     const { spotId } = req.params;

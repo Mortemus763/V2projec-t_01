@@ -1,26 +1,20 @@
 import { useState, useEffect, useRef } from 'react';
-import { useDispatch } from 'react-redux';
+import { useDispatch, useSelector } from 'react-redux';
 import * as sessionActions from '../../store/session';
 import { FaUserCircle } from "react-icons/fa";
 import { TfiMenu } from "react-icons/tfi";
 import OpenModalButton from '../OpenModalButton/OpenModalButton';
 import LoginFormModal from '../LoginFormModal/LoginFormModal';
 import SignupFormModal from '../SignupFormModal/SignupFormModal';
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 
-function ProfileButton({ user }) {
+function ProfileButton() {
     const dispatch = useDispatch();
+    const navigate = useNavigate();
+    const user = useSelector((state) => state.session.user);
     const [showMenu, setShowMenu] = useState(false);
-    const [loading, setLoading] = useState(true);
+    
     const ulRef = useRef();
-    useEffect(() => {
-      // Simulate a loading period for user data
-      if (user) {
-        setLoading(false); // Stop loading when user is available
-      } else {
-        setLoading(true); // Show loading if user is not defined
-      }
-    }, [user]);
 
     const toggleMenu = (e) => {
       e.stopPropagation(); // Keep from bubbling up to document and triggering closeMenu
@@ -47,9 +41,10 @@ function ProfileButton({ user }) {
       e.preventDefault();
       dispatch(sessionActions.logout());
       closeMenu();
+      navigate("/");
     };
     const ulClassName = `profile-dropdown ${showMenu ? "visible" : "hidden"}`;
-  
+
     return (
       <>
         <button className="dropdown-toggle" onClick={toggleMenu}>
@@ -57,12 +52,10 @@ function ProfileButton({ user }) {
           <FaUserCircle size={24} color="gray" />
         </button>
         <ul className={ulClassName} ref={ulRef}>
-          {loading ? ( // Show a loading message while user is loading
-            <li>Loading...</li>
-          ) : user ? ( // Show user details if available
+          {user ? ( 
             <>
-              <li className="greeting">Hello, {user.firstname}</li>
-              <li className="user-info">{user.email}</li>
+              <li className="greeting">Hello, {user?.firstname}</li>
+              <li className="user-info">{user?.email}</li>
               <li>
                 <Link to="/manage-spots" className="manage-spots-link">
                   Manage Spots
