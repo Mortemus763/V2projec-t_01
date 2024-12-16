@@ -109,10 +109,10 @@
     }
   }
   .loading {
-    text-align: center;
-    font-size: 1.5rem;
-    color: grey;
-    margin-top: 50px;
+    text-align: center !important;
+    font-size: 1.5rem !important;
+    color: grey !important;
+    margin-top: 50px !important;
   }
   .no-spots-message {
     text-align: center;

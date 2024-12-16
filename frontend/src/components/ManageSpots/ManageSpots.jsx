@@ -85,7 +85,7 @@ function ManageSpots() {
     <div className="manage-spots-page">
       <h1>Manage Spots</h1>
       {isLoading ? ( // Show loading state
-        <div className="loading-message">
+        <div className="loading">
           <p>Loading spots...</p>
         </div>
       ) : spots.length === 0 ? (
