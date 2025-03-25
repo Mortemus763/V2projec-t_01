@@ -1,5 +1,7 @@
 import Cookies from 'js-cookie';
 
+const BASE_URL = import.meta.env.VITE_BACKEND_URL || '';
+
 export async function csrfFetch(url, options = {}) {
   // set options.method to 'GET' if there is no method
   options.method = options.method || 'GET';
