@@ -21,7 +21,7 @@ if (!isProduction) {
     app.use(cors());
 } else {
   app.use(cors({
-  origin: "https://v2projec-t-01-3.onrender.com"
+  origin: "https://v2projec-t-01-3.onrender.com",
   credentials: true
   }));
 
