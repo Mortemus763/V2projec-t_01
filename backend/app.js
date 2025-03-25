@@ -19,6 +19,12 @@ app.use(express.json());
 if (!isProduction) {
     // enable cors only in development
     app.use(cors());
+} else {
+  app.use(cors({
+  origin: "https://v2projec-t-01-3.onrender.com"
+  credentials: true
+  }));
+
   }
 
   // helmet helps set a variety of headers to better secure your app
