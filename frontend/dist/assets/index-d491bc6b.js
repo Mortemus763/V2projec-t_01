@@ -12651,18 +12651,22 @@ function rs(e, t) {
 var o0 = rs(r0, {
     path: "/"
 });
+import Cookies from "js-cookie";
+
 const l0 = "https://v2projec-t-01-3-api.onrender.com";
 async function at(e, t={}) {
     t.method = t.method || "GET",
     t.headers = t.headers || {},
-    t.credentials = "include",
-    t.method.toUpperCase() !== "GET" && (t.headers["Content-Type"] = t.headers["Content-Type"] || "application/json",
-    t.headers["XSRF-Token"] = o0.get("XSRF-TOKEN"));
+    t.credentials = "include";
+    if (t.method.toUpperCase() !== "GET") {
+    t.headers["Content-Type"] = t.headers["Content-Type"] || "application/json";
+    t.headers["XSRF-Token"] = o0.get("XSRF-TOKEN");
+    }
     const n = `${l0}${e}`
-      , r = await window.fetch(n, t);
-    if (r.status >= 400)
-        throw r;
-    return r
+      const r = await window.fetch(n, t);
+    if (r.status >= 400) throw r;
+
+    return r;
 }
 const Qp = "session/setUser"
   , Kp = "session/removeUser"
@@ -13358,14 +13362,15 @@ function R0({isLoaded: e}) {
 const N0 = () => {
     const [e,t] = x.useState([])
       , [n,r] = x.useState(!0);
-    return x.useEffect( () => {
+    //return
+    x.useEffect( () => {
         (async () => {
             try {
-                const i = await (await fetch("/api/spots")).json()
-                  , s = (await Promise.all(i.Spots.map(async u => {
+                const i = await (await fetch("/api/spots")).json();
+                  const s = (await Promise.all(i.Spots.map(async u => {
                     const g = (await (await fetch(`/api/spots/${u.id}/reviews`)).json()).Reviews || []
-                      , w = g.length
-                      , S = w ? (g.reduce( (y, k) => y + k.stars, 0) / w).toFixed(1) : "New";
+                      const w = g.length
+                      const S = w ? (g.reduce( (y, k) => y + k.stars, 0) / w).toFixed(1) : "New";
                     return {
                         ...u,
                         avgStarRating: S,
@@ -14898,4 +14903,3 @@ ia.createRoot(document.getElementById("root")).render(c.jsx(Tt.StrictMode, {
         })
     })
 }));
-
