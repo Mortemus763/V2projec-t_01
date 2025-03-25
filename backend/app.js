@@ -20,6 +20,7 @@ app.use(express.json());
     // enable cors only in development
     //app.use(cors());
 //} else {
+  const cors = require("cors");
   app.use(cors({
   origin: "https://v2projec-t-01-3.onrender.com",
   credentials: true
@@ -34,6 +35,7 @@ app.use(express.json());
   );
 
   // Set the _csrf token and create req.csrfToken method
+  const csurf = require("csurf");
   app.use(
     csurf({
       cookie: {
