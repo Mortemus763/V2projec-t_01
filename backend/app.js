@@ -20,14 +20,14 @@ if (!isProduction) {
     // enable cors only in development
     app.use(cors());
   }
-  
+
   // helmet helps set a variety of headers to better secure your app
   app.use(
     helmet.crossOriginResourcePolicy({
       policy: "cross-origin"
     })
   );
-  
+
   // Set the _csrf token and create req.csrfToken method
   app.use(
     csurf({
@@ -39,7 +39,7 @@ if (!isProduction) {
     })
   );
 
-  app.use(routes);
+  app.use('/api',routes);
 
   app.use((_req, _res, next) => {
     const err = new Error("The requested resource couldn't be found.");
@@ -48,7 +48,7 @@ if (!isProduction) {
     err.status = 404;
     next(err);
   });
-  
+
   app.use((err, _req, _res, next) => {
     // check if error is a Sequelize error:
     if (err instanceof ValidationError) {
