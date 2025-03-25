@@ -7,9 +7,9 @@
 //const reviewRouter = require('./review.js');
 //const reviewImagesRouter = require('./reviewimages.js');
 //const { restoreUser } = require("../../utils/auth.js");
-const express = require('express');
-const router = express.Router();
-const apiRouter = require('/api');
+//const express = require('express');
+//const router = express.Router();
+//const apiRouter = require('/api');
 
 
 // Connect restoreUser middleware to the API router
@@ -29,10 +29,10 @@ const apiRouter = require('/api');
 
 //router.use('/review-images', reviewImagesRouter);
 
-router.use('/api', apiRouter);
+//router.use('/api', apiRouter);
 
 //router.post('/test', (req, res) => {
   //res.json({ requestBody: req.body });
 //});
 
-module.exports = router;
+//module.exports = router;
